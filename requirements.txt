@@ -1,0 +1,15 @@
+fpdf2
+pandas
+streamlit
+plotly
+requests
+arabic-reshaper
+python-bidi
+fastapi
+uvicorn
+sqlalchemy>=2.0,<3.0
+psycopg[binary]>=3.2,<4.0
+pydantic-settings
+PyJWT>=2.9,<3.0
+
+python-multipart>=0.0.20,<1.0
