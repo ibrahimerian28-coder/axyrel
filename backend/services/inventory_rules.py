@@ -211,6 +211,89 @@ class InventoryBusinessRules:
         db.flush()
         return stock
 
+    def consume_technician_stock(
+        self,
+        db: Session,
+        company_id: UUID | None,
+        technician_id: UUID,
+        item_id: UUID,
+        quantity: int,
+        *,
+        reference_type: str | None = None,
+        reference_id: str | None = None,
+        notes: str | None = None,
+    ) -> TechnicianStock:
+        """Deduct installed quantity from technician-held inventory."""
+        quantity = self._positive_quantity(quantity)
+        stock = self.technician_stock_repository.get_for_technician_item(
+            db, company_id, technician_id, item_id
+        )
+        if stock is None or int(stock.quantity) < quantity:
+            raise ValueError("Insufficient technician inventory")
+
+        stock.quantity -= quantity
+        self.transaction_repository.create(
+            db,
+            company_id,
+            {
+                "inventory_item_id": item_id,
+                "transaction_type": "OUT",
+                "quantity": quantity,
+                "reference_type": reference_type,
+                "reference_id": reference_id,
+                "notes": notes,
+            },
+        )
+        db.flush()
+        return stock
+
+    def restore_technician_stock(
+        self,
+        db: Session,
+        company_id: UUID | None,
+        technician_id: UUID,
+        item_id: UUID,
+        quantity: int,
+        *,
+        reference_type: str | None = None,
+        reference_id: str | None = None,
+        notes: str | None = None,
+    ) -> TechnicianStock:
+        """Return previously installed quantity to technician-held inventory."""
+        quantity = self._positive_quantity(quantity)
+        self._required_item(db, company_id, item_id)
+        stock = self.technician_stock_repository.get_for_technician_item(
+            db, company_id, technician_id, item_id
+        )
+        if stock is None:
+            stock = self.technician_stock_repository.create(
+                db,
+                company_id,
+                {
+                    "technician_id": technician_id,
+                    "inventory_item_id": item_id,
+                    "quantity": quantity,
+                },
+            )
+        else:
+            stock.quantity += quantity
+            db.flush()
+
+        self.transaction_repository.create(
+            db,
+            company_id,
+            {
+                "inventory_item_id": item_id,
+                "transaction_type": "IN",
+                "quantity": quantity,
+                "reference_type": reference_type,
+                "reference_id": reference_id,
+                "notes": notes,
+            },
+        )
+        db.flush()
+        return stock
+
     @staticmethod
     def _positive_quantity(quantity: int) -> int:
         quantity = int(quantity)

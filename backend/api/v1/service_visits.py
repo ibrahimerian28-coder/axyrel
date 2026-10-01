@@ -3,6 +3,7 @@ from __future__ import annotations
 from uuid import UUID
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
 from backend.services.service_visit import ServiceVisitService
 from backend.schemas.service_visit import ServiceVisitCreate, ServiceVisitUpdate, ServiceVisitRead
 from backend.api.dependencies import DBSession, CompanyID
@@ -11,10 +12,37 @@ from backend.core.authorization import Permission, require_permission
 router = APIRouter(prefix="/service-visits", tags=["service visits"])
 service = ServiceVisitService()
 
+
+class ServiceVisitPartInstall(BaseModel):
+    inventory_item_id: UUID
+    quantity: int = Field(gt=0)
+
+
+def _bad_request(exc: ValueError) -> HTTPException:
+    return HTTPException(status_code=400, detail=str(exc))
+
+
 @router.get("", response_model=list[ServiceVisitRead], dependencies=[Depends(require_permission(Permission.SERVICE_READ))])
-def list_records(db: DBSession, company_id: CompanyID, ):
-    kwargs = {}
-    return service.list_visits(db, company_id, **kwargs)
+def list_records(
+    db: DBSession,
+    company_id: CompanyID,
+    work_order_id: UUID | None = None,
+    schedule_id: UUID | None = None,
+    technician_id: UUID | None = None,
+    status: str | None = None,
+    start_from: datetime | None = None,
+    start_to: datetime | None = None,
+):
+    return service.list_visits(
+        db,
+        company_id,
+        work_order_id=work_order_id,
+        schedule_id=schedule_id,
+        technician_id=technician_id,
+        status=status,
+        start_from=start_from,
+        start_to=start_to,
+    )
 
 @router.get("/{visit_id}", response_model=ServiceVisitRead, dependencies=[Depends(require_permission(Permission.SERVICE_READ))])
 def get_record(visit_id: UUID, db: DBSession, company_id: CompanyID):
@@ -25,14 +53,44 @@ def get_record(visit_id: UUID, db: DBSession, company_id: CompanyID):
 
 @router.post("", response_model=ServiceVisitRead, status_code=201, dependencies=[Depends(require_permission(Permission.SERVICE_MANAGE))])
 def create_record(payload: ServiceVisitCreate, db: DBSession, company_id: CompanyID):
-    record = service.create_visit(db, company_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.create_visit(db, company_id, payload.model_dump(exclude_unset=True))
+    except ValueError as exc:
+        raise _bad_request(exc) from exc
     db.commit()
     db.refresh(record)
     return record
 
 @router.patch("/{visit_id}", response_model=ServiceVisitRead, dependencies=[Depends(require_permission(Permission.SERVICE_MANAGE))])
 def update_record(visit_id: UUID, payload: ServiceVisitUpdate, db: DBSession, company_id: CompanyID):
-    record = service.update_visit(db, company_id, visit_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.update_visit(db, company_id, visit_id, payload.model_dump(exclude_unset=True))
+    except ValueError as exc:
+        raise _bad_request(exc) from exc
+    if record is None:
+        raise HTTPException(status_code=404, detail="service_visits record not found")
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+@router.post(
+    "/{visit_id}/parts",
+    response_model=ServiceVisitRead,
+    dependencies=[Depends(require_permission(Permission.SERVICE_MANAGE))],
+)
+def install_part(
+    visit_id: UUID,
+    payload: ServiceVisitPartInstall,
+    db: DBSession,
+    company_id: CompanyID,
+):
+    try:
+        record = service.install_part(
+            db, company_id, visit_id, payload.inventory_item_id, payload.quantity
+        )
+    except ValueError as exc:
+        raise _bad_request(exc) from exc
     if record is None:
         raise HTTPException(status_code=404, detail="service_visits record not found")
     db.commit()
@@ -41,7 +99,10 @@ def update_record(visit_id: UUID, payload: ServiceVisitUpdate, db: DBSession, co
 
 @router.delete("/{visit_id}", status_code=204, dependencies=[Depends(require_permission(Permission.SERVICE_MANAGE))])
 def delete_record(visit_id: UUID, db: DBSession, company_id: CompanyID):
-    record = service.delete_visit(db, company_id, visit_id)
+    try:
+        record = service.delete_visit(db, company_id, visit_id)
+    except ValueError as exc:
+        raise _bad_request(exc) from exc
     if record is None:
         raise HTTPException(status_code=404, detail="service_visits record not found")
     db.commit()

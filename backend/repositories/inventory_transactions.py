@@ -40,6 +40,21 @@ class InventoryTransactionRepository(TenantScopedRepository):
         stmt = stmt.order_by(InventoryTransaction.created_at.desc())
         return list(db.scalars(stmt).all())
 
+    def list_by_reference(
+        self,
+        db: Session,
+        company_id: UUID | None,
+        reference_type: str,
+        reference_id: str,
+    ) -> list[InventoryTransaction]:
+        company_id = require_company_id(company_id)
+        stmt = select(InventoryTransaction).where(
+            InventoryTransaction.company_id == company_id,
+            InventoryTransaction.reference_type == reference_type,
+            InventoryTransaction.reference_id == reference_id,
+        )
+        return list(db.scalars(stmt.order_by(InventoryTransaction.created_at.asc())).all())
+
     def create(
         self,
         db: Session,
