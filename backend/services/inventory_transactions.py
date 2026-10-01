@@ -34,6 +34,9 @@ class InventoryTransactionService:
         company_id: UUID | None,
         data: dict,
     ):
+        reference_type = str(data.get("reference_type") or "").strip().upper()
+        if reference_type in {"SERVICE_VISIT_INSTALL", "SERVICE_VISIT_REVERSAL"}:
+            raise ValueError("Service Visit inventory references are reserved for the Service Visit workflow")
         transaction_type = str(data.get("transaction_type", "")).strip().upper()
         if transaction_type not in ALLOWED_TRANSACTION_TYPES:
             raise ValueError(
@@ -42,4 +45,6 @@ class InventoryTransactionService:
         data = {**data, "transaction_type": transaction_type}
         if int(data.get("quantity", 0)) <= 0:
             raise ValueError("quantity must be greater than zero")
+        if isinstance(data.get("reference_id"), UUID):
+            data = {**data, "reference_id": str(data["reference_id"])}
         return self.repository.create(db, company_id, data)

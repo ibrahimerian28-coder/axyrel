@@ -1,5 +1,6 @@
 """Tenant-scoped persistence operations for inventory transactions."""
 
+from typing import List
 from uuid import UUID
 
 from sqlalchemy import select
@@ -46,7 +47,7 @@ class InventoryTransactionRepository(TenantScopedRepository):
         company_id: UUID | None,
         reference_type: str,
         reference_id: str,
-    ) -> list[InventoryTransaction]:
+    ) -> List[InventoryTransaction]:
         company_id = require_company_id(company_id)
         stmt = select(InventoryTransaction).where(
             InventoryTransaction.company_id == company_id,

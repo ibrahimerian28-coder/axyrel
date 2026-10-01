@@ -66,6 +66,11 @@ class ServiceVisitService:
             if work_order.status == "Cancelled" and target_status != "Cancelled":
                 raise ValueError("Cannot reopen a service visit on a cancelled work order")
 
+        if "work_order_id" in data and data["work_order_id"] != visit.work_order_id:
+            destination = self._required_work_order(db, company_id, data["work_order_id"])
+            if destination.status == "Cancelled" and (target_status or previous_status) != "Cancelled":
+                raise ValueError("Cannot reassign a non-cancelled service visit to a cancelled work order")
+
         updated = self.repository.update(db, company_id, visit_id, data)
         if updated is None:
             return None
@@ -114,7 +119,7 @@ class ServiceVisitService:
             quantity,
             reference_type=SERVICE_VISIT_INSTALL_REF,
             reference_id=str(visit.id),
-            notes=f"Installed on service visit {visit.id}",
+            notes=f"Installed on service visit {visit.id}; technician_id={technician_id}",
         )
         return visit
 
@@ -125,26 +130,23 @@ class ServiceVisitService:
         reversals = self.inventory_rules.transaction_repository.list_by_reference(
             db, company_id, SERVICE_VISIT_REVERSAL_REF, str(visit.id)
         )
-        installed_qty: dict[UUID, int] = {}
-        reversed_qty: dict[UUID, int] = {}
+        def stock_owner_key(row):
+            _, marker, owner = (row.notes or "").rpartition("; technician_id=")
+            if not marker:
+                raise ValueError("Cannot reverse service visit inventory: original technician is not recorded")
+            return UUID(owner), row.inventory_item_id
+
+        installed_qty: dict[tuple[UUID, UUID], int] = {}
+        reversed_qty: dict[tuple[UUID, UUID], int] = {}
         for row in installs:
-            installed_qty[row.inventory_item_id] = installed_qty.get(row.inventory_item_id, 0) + int(
-                row.quantity
-            )
+            key = stock_owner_key(row)
+            installed_qty[key] = installed_qty.get(key, 0) + int(row.quantity)
         for row in reversals:
-            reversed_qty[row.inventory_item_id] = reversed_qty.get(row.inventory_item_id, 0) + int(
-                row.quantity
-            )
+            key = stock_owner_key(row)
+            reversed_qty[key] = reversed_qty.get(key, 0) + int(row.quantity)
 
-        work_order = self.work_order_repository.get(db, company_id, visit.work_order_id)
-        technician_id = visit.technician_id or (
-            work_order.assigned_technician_id if work_order else None
-        )
-        if technician_id is None:
-            return
-
-        for item_id, quantity in installed_qty.items():
-            remaining = quantity - reversed_qty.get(item_id, 0)
+        for (technician_id, item_id), quantity in installed_qty.items():
+            remaining = quantity - reversed_qty.get((technician_id, item_id), 0)
             if remaining <= 0:
                 continue
             self.inventory_rules.restore_technician_stock(
@@ -155,7 +157,7 @@ class ServiceVisitService:
                 remaining,
                 reference_type=SERVICE_VISIT_REVERSAL_REF,
                 reference_id=str(visit.id),
-                notes=f"Reversed from cancelled service visit {visit.id}",
+                notes=f"Reversed from cancelled service visit {visit.id}; technician_id={technician_id}",
             )
 
     def _sync_work_order_from_visits(

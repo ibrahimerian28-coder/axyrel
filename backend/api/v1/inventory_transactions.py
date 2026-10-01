@@ -24,4 +24,8 @@ def get_transaction(transaction_id: UUID, db: DBSession, company_id: CompanyID):
     return r
 @router.post("", status_code=201, dependencies=[Depends(require_permission(Permission.INVENTORY_MANAGE))])
 def create_transaction(payload: TransactionCreate, db: DBSession, company_id: CompanyID):
-    r=service.create_transaction(db, company_id, payload.model_dump()); db.commit(); db.refresh(r); return r
+    try:
+        r=service.create_transaction(db, company_id, payload.model_dump())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    db.commit(); db.refresh(r); return r
