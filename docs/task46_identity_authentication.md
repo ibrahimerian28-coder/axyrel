@@ -53,7 +53,7 @@ python -m backend.scripts.create_admin
 This creates the first company and administrator interactively without storing a password in source code.
 
 ## Streamlit compatibility
-- Legacy mode continues using the existing Streamlit admin password.
+- API-backed mode is the official and only required operating mode for the current MVP, per the owner decision dated 2026-10-02. Legacy authentication and persistence fallback are not acceptance requirements; do not reconstruct or restore them. See the [Task 46 accepted checkpoint](task46_final_checkpoint.md#d46-03--owner-scope-decision).
 - API mode authenticates through FastAPI login and stores the returned bearer token in Streamlit session state.
 - `AXYREL_API_TOKEN` remains supported as a pre-issued JWT for operational compatibility.
 - `AXYREL_COMPANY_ID` is retained only as a deprecated configuration field and is no longer sent to the API.
@@ -69,5 +69,5 @@ This creates the first company and administrator interactively without storing a
 - Existing bearer tokens are rejected after the company is deactivated because every authenticated request re-resolves the user and company from the database.
 - `/api/v1/auth/me` returns the user's effective permissions derived from the database role.
 - Streamlit API mode uses the authenticated role and effective permissions to build the available module menu; it no longer hardcodes every API-authenticated user as `admin`.
-- The legacy Streamlit mode remains admin-only and is unchanged.
+- Earlier wording requiring unchanged admin-only legacy mode is superseded by the owner scope decision dated 2026-10-02; D46-03 is closed by scope clarification, not a code fix.
 - Task 46 security tests cover inactive users/companies, token invalidity, tenant-header tampering, role permissions, and JWT permission-claim elevation attempts.

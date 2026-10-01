@@ -3,6 +3,8 @@
 ## Objective
 Connect the existing Streamlit presentation layer to the migrated FastAPI backend without rewriting the UI in this task.
 
+**Current scope clarification (2026-10-02):** The legacy fallback, API/Legacy indicator, and deferred legacy-screen statements below describe the Task 45 transition, not current operating requirements. The owner approves API-backed mode as the only required MVP mode; do not restore legacy authentication or persistence fallback. See the [Task 46 accepted checkpoint](task46_final_checkpoint.md#d46-03--owner-scope-decision).
+
 ## Implementation
 - Added `utils/api_client.py` as the single HTTP boundary for Streamlit.
 - Extended Task 43 settings with API base URL, bearer token, timeout, and an explicit UI API feature flag.

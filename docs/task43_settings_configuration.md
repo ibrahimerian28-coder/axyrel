@@ -3,6 +3,8 @@
 ## Scope
 Centralize runtime/backend configuration without changing the legacy Streamlit UI contract.
 
+**Current scope clarification (2026-10-02):** This document's legacy compatibility wording records the Task 43 transition. The owner now requires only API-backed operation for the current MVP; operational legacy authentication/fallback is not required. See the [Task 46 accepted checkpoint](task46_final_checkpoint.md#d46-03--owner-scope-decision).
+
 ## Implemented
 - Typed `backend.core.config.Settings` based on pydantic-settings.
 - Environment variable aliases for application name/version/environment/API prefix.
