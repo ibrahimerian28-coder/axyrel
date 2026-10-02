@@ -336,11 +336,13 @@ Carry-forward: No direct database calls remain in presentation sources; import b
 
 ## Task 71 — Unit Tests for Core Services
 
-Status: NEXT — NOT STARTED (three-task batch limit)
+Status: DONE — ACCEPTED
+
+Carry-forward: Twelve isolated core-rule tests added; accepted integration coverage preserved and impacted Task 47 contracts verified. See docs/task71_final_checkpoint.md.
 
 ## Task 72 — API Tests
 
-Status: PENDING
+Status: NEXT
 
 ## Task 73 — Database / Repository Tests
 
