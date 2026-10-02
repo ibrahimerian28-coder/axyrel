@@ -402,11 +402,13 @@ Carry-forward: Current PostgreSQL constraints/indexes and synthetic outcome/reje
 
 ## Task 82 — Validate Permissions
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Existing role/resource matrices and canonical database-authoritative permissions passed 45 checks; no policy changes. See docs/task82_final_checkpoint.md.
 
 ## Task 83 — Validate Financial Calculations
 
-Status: PENDING
+Status: NEXT
 
 ## Task 84 — Validate Inventory Calculations
 
