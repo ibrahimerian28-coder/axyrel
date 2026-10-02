@@ -318,11 +318,13 @@ Carry-forward: Customer/Inventory CREATE-only trim/blank rule consolidated inter
 
 ## Task 68 — Remove Obsolete Maintenance Architecture
 
-Status: NEXT — NOT STARTED (three-task batch limit)
+Status: DONE — ACCEPTED
+
+Carry-forward: Unused parts selector and legacy visit-history renderer removed; current routed Maintenance and Visit contracts verified. See docs/task68_final_checkpoint.md.
 
 ## Task 69 — Remove Obsolete Store Architecture
 
-Status: PENDING
+Status: NEXT
 
 ## Task 70 — Remove Obsolete Streamlit-to-Database Calls
 
