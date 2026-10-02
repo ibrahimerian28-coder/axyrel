@@ -306,11 +306,13 @@ Carry-forward: Removed unused facade/consumer dependency group; active API routi
 
 ## Task 66 — Remove Obsolete Legacy Business Logic
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Unused legacy visit prediction and float coercion helpers removed; active API modules/import graph verified. See docs/task66_final_checkpoint.md. Maintenance architecture remnants remain Task 68.
 
 ## Task 67 — Remove Duplicated Business Logic
 
-Status: PENDING
+Status: NEXT
 
 ## Task 68 — Remove Obsolete Maintenance Architecture
 

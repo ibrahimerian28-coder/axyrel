@@ -7,7 +7,8 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 REMOVED = {'utils.data_service', 'utils.inventory_service', 'utils.inventory_history_service',
-           'components.customers.customer_actions', 'components.customers.customer_add_form'}
+           'components.customers.customer_actions', 'components.customers.customer_add_form',
+           'components.customers.customer_summary', 'utils.helpers'}
 
 
 class Task65APIDependencyTests(unittest.TestCase):
