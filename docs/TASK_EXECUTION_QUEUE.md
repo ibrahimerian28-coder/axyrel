@@ -330,11 +330,13 @@ Carry-forward: Unused legacy Store_Products identifier removed; current inventor
 
 ## Task 70 — Remove Obsolete Streamlit-to-Database Calls
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: No direct database calls remain in presentation sources; import boundary and authenticated HTTP/failure contract verified. See docs/task70_final_checkpoint.md. Stop after push verification at the batch limit.
 
 ## Task 71 — Unit Tests for Core Services
 
-Status: PENDING
+Status: NEXT — NOT STARTED (three-task batch limit)
 
 ## Task 72 — API Tests
 
