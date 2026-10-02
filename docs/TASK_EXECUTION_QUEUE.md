@@ -396,11 +396,13 @@ Carry-forward: Accepted API journey and stock lifecycle validation passed 16 che
 
 ## Task 81 — Validate Database Integrity
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Current PostgreSQL constraints/indexes and synthetic outcome/rejection/rollback integrity passed 18 checks; no real-data certification. See docs/task81_final_checkpoint.md.
 
 ## Task 82 — Validate Permissions
 
-Status: PENDING
+Status: NEXT
 
 ## Task 83 — Validate Financial Calculations
 
