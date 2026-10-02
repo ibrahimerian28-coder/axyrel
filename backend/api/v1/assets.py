@@ -27,14 +27,20 @@ def get_record(asset_id: UUID, db: DBSession, company_id: CompanyID):
 
 @router.post("", response_model=AssetRead, status_code=201, dependencies=[Depends(require_permission(Permission.ASSET_MANAGE))])
 def create_record(payload: AssetCreate, db: DBSession, company_id: CompanyID):
-    record = service.create_asset(db, company_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.create_asset(db, company_id, payload.model_dump(exclude_unset=True))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     db.commit()
     db.refresh(record)
     return record
 
 @router.patch("/{asset_id}", response_model=AssetRead, dependencies=[Depends(require_permission(Permission.ASSET_MANAGE))])
 def update_record(asset_id: UUID, payload: AssetUpdate, db: DBSession, company_id: CompanyID):
-    record = service.update_asset(db, company_id, asset_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.update_asset(db, company_id, asset_id, payload.model_dump(exclude_unset=True))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if record is None:
         raise HTTPException(status_code=404, detail="assets record not found")
     db.commit()

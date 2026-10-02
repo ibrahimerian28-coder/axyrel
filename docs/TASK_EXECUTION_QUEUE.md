@@ -221,12 +221,12 @@ Status: DONE / ACCEPTED / COMMITTED / PUSHED
 
 ## Task 50 — Customer → Asset Integration
 
-Status: NEXT
-Dependencies/Carry-forward: Task 49 finalized; bootstrap must be committed, pushed, and verified before autonomous analysis begins.
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: See docs/task50_final_checkpoint.md; committed completion state must be verified against the Task 50 commit and actual remote before continuing.
 
 ## Task 51 — Service Request → Work Order Integration
 
-Status: PENDING
+Status: NEXT
 
 ## Task 52 — Work Order → Scheduling Integration
 
