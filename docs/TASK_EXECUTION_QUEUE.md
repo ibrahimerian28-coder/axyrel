@@ -450,4 +450,6 @@ Carry-forward: OD-29 synthetic first-use rehearsal passed, one focused UI/API/Po
 
 ## Task 90 — Post-Launch Critical Fixes Only
 
-Status: NEXT
+Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+
+Gate: No actual launch/usage exists; OD-25–29 are offline/internal substitutions only. Clarify final internal critical-defect closure versus deferred actual post-launch acceptance. See docs/task90_owner_decision_required.md. No future task introduced.
