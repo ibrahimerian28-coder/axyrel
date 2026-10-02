@@ -444,10 +444,10 @@ Carry-forward: OD-28 internal MVP launch-readiness review and owner handoff acce
 
 ## Task 89 — First Real-World Usage
 
-Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+Status: DONE — ACCEPTED
 
-Gate: OD-28 permits internal readiness/handoff only, not real users/business data/onboarding/production. Clarify synthetic first-use acceptance or approve actual usage target/participants/data/actions. See docs/task89_owner_decision_required.md. Task 90 not started.
+Carry-forward: OD-29 synthetic first-use rehearsal passed, one focused UI/API/PostgreSQL case plus reused evidence; no real customer/employee/business operation. No review blocker or fix. See docs/task89_final_checkpoint.md and docs/task89_synthetic_first_use.md.
 
 ## Task 90 — Post-Launch Critical Fixes Only
 
-Status: PENDING
+Status: NEXT
