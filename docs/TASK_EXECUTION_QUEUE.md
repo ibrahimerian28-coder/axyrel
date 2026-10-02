@@ -251,12 +251,12 @@ Dependencies/Carry-forward: Existing accepted Work Order → Service Visit → i
 
 ## Task 56 — Work Order → Billing Integration
 
-Status: NEXT
-Dependencies/Carry-forward: Not started. Current autonomous batch stops after Task 55 under the three-task limit.
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: OD-17 Option A implemented; see docs/task56_final_checkpoint.md. Verify commit/push before continuing. Optional links and approved Invoice totals preserved; no schema or monetary-rule changes.
 
 ## Task 57 — Expenses → Profitability Integration
 
-Status: PENDING
+Status: NEXT
 
 ## Task 58 — Notifications / Audit Integration
 

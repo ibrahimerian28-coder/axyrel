@@ -3,7 +3,7 @@ from __future__ import annotations
 from uuid import UUID
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
-from backend.services.invoice import InvoiceService
+from backend.services.invoice import InvoiceService, WorkOrderReferenceError
 from backend.schemas.invoice import InvoiceCreate, InvoiceUpdate, InvoiceRead
 from backend.api.dependencies import DBSession, CompanyID
 from backend.core.authorization import Permission, require_permission
@@ -28,14 +28,20 @@ def get_record(invoice_id: UUID, db: DBSession, company_id: CompanyID):
 
 @router.post("", response_model=InvoiceRead, status_code=201, dependencies=[Depends(require_permission(Permission.BILLING_MANAGE))])
 def create_record(payload: InvoiceCreate, db: DBSession, company_id: CompanyID):
-    record = service.create_invoice(db, company_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.create_invoice(db, company_id, payload.model_dump(exclude_unset=True))
+    except WorkOrderReferenceError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     db.commit()
     db.refresh(record)
     return record
 
 @router.patch("/{invoice_id}", response_model=InvoiceRead, dependencies=[Depends(require_permission(Permission.BILLING_MANAGE))])
 def update_record(invoice_id: UUID, payload: InvoiceUpdate, db: DBSession, company_id: CompanyID):
-    record = service.update_invoice(db, company_id, invoice_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.update_invoice(db, company_id, invoice_id, payload.model_dump(exclude_unset=True))
+    except WorkOrderReferenceError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if record is None:
         raise HTTPException(status_code=404, detail="invoices record not found")
     db.commit()
