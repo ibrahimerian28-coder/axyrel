@@ -33,16 +33,19 @@ def list_records(
     start_from: datetime | None = None,
     start_to: datetime | None = None,
 ):
-    return service.list_visits(
-        db,
-        company_id,
-        work_order_id=work_order_id,
-        schedule_id=schedule_id,
-        technician_id=technician_id,
-        status=status,
-        start_from=start_from,
-        start_to=start_to,
-    )
+    try:
+        return service.list_visits(
+            db,
+            company_id,
+            work_order_id=work_order_id,
+            schedule_id=schedule_id,
+            technician_id=technician_id,
+            status=status,
+            start_from=start_from,
+            start_to=start_to,
+        )
+    except ValueError as exc:
+        raise _bad_request(exc) from exc
 
 @router.get("/{visit_id}", response_model=ServiceVisitRead, dependencies=[Depends(require_permission(Permission.SERVICE_READ))])
 def get_record(visit_id: UUID, db: DBSession, company_id: CompanyID):

@@ -1,4 +1,4 @@
-"""Owner-approved event-time policy (OD-14), currently applied to Scheduling."""
+"""Owner-approved event-time policy (OD-14) for Schedule and Service Visit events."""
 
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo

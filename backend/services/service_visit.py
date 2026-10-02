@@ -1,9 +1,12 @@
 """Business service for the Axyrel Service Visit domain."""
 
+from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from backend.core.event_time import normalize_event_time
+from backend.repositories.schedule import ScheduleRepository
 from backend.repositories.service_visit import ServiceVisitRepository
 from backend.repositories.work_order import WorkOrderRepository
 from backend.services.inventory_rules import InventoryBusinessRules
@@ -25,18 +28,44 @@ class ServiceVisitService:
         repository: ServiceVisitRepository | None = None,
         work_order_repository: WorkOrderRepository | None = None,
         inventory_rules: InventoryBusinessRules | None = None,
+        schedule_repository: ScheduleRepository | None = None,
     ) -> None:
         self.repository = repository or ServiceVisitRepository()
         self.work_order_repository = work_order_repository or WorkOrderRepository()
         self.inventory_rules = inventory_rules or InventoryBusinessRules()
+        self.schedule_repository = schedule_repository or ScheduleRepository()
+
+    def _validate_schedule(self, db: Session, company_id: UUID | None, schedule_id):
+        if schedule_id is not None and self.schedule_repository.get(db, company_id, schedule_id) is None:
+            raise ValueError("Schedule not found.")
+
+    @staticmethod
+    def _normalized_data(data: dict) -> dict:
+        normalized = dict(data)
+        for field in ("actual_start_at", "actual_end_at"):
+            if normalized.get(field) is not None:
+                normalized[field] = normalize_event_time(normalized[field])
+        return normalized
+
+    @staticmethod
+    def _validate_range(start: datetime | None, end: datetime | None) -> None:
+        if start is not None and end is not None:
+            if normalize_event_time(end) < normalize_event_time(start):
+                raise ValueError("actual_end_at must be later than or equal to actual_start_at")
 
     def list_visits(self, db: Session, company_id: UUID | None, **filters):
+        for field in ("start_from", "start_to"):
+            if filters.get(field) is not None:
+                filters[field] = normalize_event_time(filters[field])
         return self.repository.list(db, company_id, **filters)
 
     def get_visit(self, db: Session, company_id: UUID | None, visit_id: UUID):
         return self.repository.get(db, company_id, visit_id)
 
     def create_visit(self, db: Session, company_id: UUID | None, data: dict):
+        data = self._normalized_data(data)
+        self._validate_schedule(db, company_id, data.get("schedule_id"))
+        self._validate_range(data.get("actual_start_at"), data.get("actual_end_at"))
         work_order = self._required_work_order(db, company_id, data.get("work_order_id"))
         if work_order.status == "Cancelled":
             raise ValueError("Cannot create a service visit for a cancelled work order")
@@ -57,6 +86,11 @@ class ServiceVisitService:
         if visit is None:
             return None
 
+        data = self._normalized_data(data)
+        if "schedule_id" in data:
+            self._validate_schedule(db, company_id, data["schedule_id"])
+        self._validate_range(data.get("actual_start_at", visit.actual_start_at),
+                             data.get("actual_end_at", visit.actual_end_at))
         work_order = self._required_work_order(db, company_id, visit.work_order_id)
         target_status = data.get("status")
         previous_status = visit.status

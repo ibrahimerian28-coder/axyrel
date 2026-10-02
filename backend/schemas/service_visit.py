@@ -3,7 +3,9 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+
+from backend.core.event_time import normalize_event_time
 
 
 class ServiceVisitBase(BaseModel):
@@ -16,6 +18,11 @@ class ServiceVisitBase(BaseModel):
     actual_start_at: datetime | None = None
     actual_end_at: datetime | None = None
     notes: str | None = None
+
+    @field_validator("actual_start_at", "actual_end_at")
+    @classmethod
+    def normalize_times(cls, value: datetime | None) -> datetime | None:
+        return normalize_event_time(value) if value is not None else None
 
     @model_validator(mode="after")
     def validate_actual_time_range(self):
@@ -38,6 +45,11 @@ class ServiceVisitUpdate(BaseModel):
     actual_start_at: datetime | None = None
     actual_end_at: datetime | None = None
     notes: str | None = None
+
+    @field_validator("actual_start_at", "actual_end_at")
+    @classmethod
+    def normalize_times(cls, value: datetime | None) -> datetime | None:
+        return normalize_event_time(value) if value is not None else None
 
     @model_validator(mode="after")
     def validate_actual_time_range(self):

@@ -30,8 +30,8 @@ class ServiceVisit(Base):
     )
     technician_id: Mapped[UUID | None] = mapped_column(nullable=True, index=True)
     status: Mapped[str] = mapped_column(String(30), default="Planned", nullable=False, index=True)
-    actual_start_at: Mapped[datetime | None] = mapped_column(DateTime)
-    actual_end_at: Mapped[datetime | None] = mapped_column(DateTime)
+    actual_start_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    actual_end_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     notes: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False

@@ -236,12 +236,12 @@ Dependencies/Carry-forward: OD-14 adopted; Schedule effective-state validation a
 
 ## Task 53 — Scheduling → Service Visit Integration
 
-Status: NEXT
-Dependencies/Carry-forward: Apply OD-14 to Service Visit integration and actual_start_at/actual_end_at; resolve outstanding effective-state timestamp validation and review/test its targeted migration. No implementation started. Current batch stops after Task 52 (three finalized tasks).
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: OD-15 Option A implemented; OD-14 applied to actual_start_at/actual_end_at with effective-state validation and reviewed disposable-PostgreSQL migration verification. See docs/task53_final_checkpoint.md and docs/task53_timezone_migration.md. Verify commit/push before continuing; production migration was not executed.
 
 ## Task 54 — Service Visit → Service History Integration
 
-Status: PENDING
+Status: NEXT
 
 ## Task 55 — Work Order → Inventory Integration
 
