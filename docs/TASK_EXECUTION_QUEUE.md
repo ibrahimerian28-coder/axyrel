@@ -294,11 +294,13 @@ Dependencies/Carry-forward: Independent literal source-to-target expectations, t
 
 ## Task 64 — Remove Obsolete Google Sheets Persistence
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Dependencies/Carry-forward: Sheets CSV/Apps Script fallback removed; unused external helper removed; existing supported API adapters retained. Unsupported facade reads fail explicitly; writes return False without external access. Compatibility dependency cleanup remains Task 65. See docs/task64_final_checkpoint.md. Stop after push verification at the three-task batch limit.
 
 ## Task 65 — Remove Obsolete data_service Dependencies
 
-Status: PENDING
+Status: NEXT — NOT STARTED (three-task batch limit)
 
 ## Task 66 — Remove Obsolete Legacy Business Logic
 
