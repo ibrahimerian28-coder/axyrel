@@ -450,6 +450,6 @@ Carry-forward: OD-29 synthetic first-use rehearsal passed, one focused UI/API/Po
 
 ## Task 90 — Post-Launch Critical Fixes Only
 
-Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+Status: DONE — ACCEPTED
 
-Gate: No actual launch/usage exists; OD-25–29 are offline/internal substitutions only. Clarify final internal critical-defect closure versus deferred actual post-launch acceptance. See docs/task90_owner_decision_required.md. No future task introduced.
+Carry-forward: OD-30 final internal/synthetic critical-defect audit completed using accepted evidence; no unresolved confirmed critical MVP defect within audited scope. No unnecessary suite reruns, product repair or live post-launch claim. See docs/task90_final_checkpoint.md and docs/final_axyrel_task1_90_completion_report.md. The 90-task plan ends here; control returns to the owner for MVP review. No Task 91.
