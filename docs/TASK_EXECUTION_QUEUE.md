@@ -241,11 +241,12 @@ Dependencies/Carry-forward: OD-15 Option A implemented; OD-14 applied to actual_
 
 ## Task 54 — Service Visit → Service History Integration
 
-Status: NEXT
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: OD-16 Option A implemented; see docs/task54_final_checkpoint.md. Verify task commit/push before continuing. No Service History timestamp or schema changes.
 
 ## Task 55 — Work Order → Inventory Integration
 
-Status: PENDING
+Status: NEXT
 
 ## Task 56 — Work Order → Billing Integration
 
