@@ -226,11 +226,12 @@ Dependencies/Carry-forward: See docs/task50_final_checkpoint.md; committed compl
 
 ## Task 51 — Service Request → Work Order Integration
 
-Status: NEXT
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: Owner Option A recorded in OD-13; see docs/task51_final_checkpoint.md. Verify task commit/push before continuing.
 
 ## Task 52 — Work Order → Scheduling Integration
 
-Status: PENDING
+Status: NEXT
 Dependencies/Carry-forward: Resolve/adopt the official Axyrel Date/Time & Timezone policy before Scheduling integration final acceptance; resolve outstanding Schedule effective-state timestamp validation under that policy.
 
 ## Task 53 — Scheduling → Service Visit Integration

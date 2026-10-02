@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from backend.repositories.service_visit import ServiceVisitRepository
+from backend.repositories.service_request import ServiceRequestRepository
 from backend.repositories.work_order import WorkOrderRepository
 from backend.schemas.work_order import WorkOrderSummary
 from backend.services.service_visit import ServiceVisitService
@@ -19,8 +20,10 @@ class WorkOrderService:
         repository: WorkOrderRepository | None = None,
         visit_repository: ServiceVisitRepository | None = None,
         visit_service: ServiceVisitService | None = None,
+        request_repository: ServiceRequestRepository | None = None,
     ) -> None:
         self.repository = repository or WorkOrderRepository()
+        self.request_repository = request_repository or ServiceRequestRepository()
         self.visit_repository = visit_repository or ServiceVisitRepository()
         self.visit_service = visit_service or ServiceVisitService(
             repository=self.visit_repository,
@@ -64,7 +67,12 @@ class WorkOrderService:
     def create_work_order(self, db: Session, company_id: UUID | None, data: dict):
         status = data.get("status", "Open")
         ensure_work_order_transition("Open", status)
+        self._validate_service_request(db, company_id, data.get("service_request_id"))
         return self.repository.create(db, company_id, data)
+
+    def _validate_service_request(self, db, company_id, request_id):
+        if request_id is not None and self.request_repository.get(db, company_id, request_id) is None:
+            raise ValueError("Service request not found.")
 
     def update_work_order(
         self, db: Session, company_id: UUID | None, work_order_id: UUID, data: dict
@@ -72,6 +80,9 @@ class WorkOrderService:
         work_order = self.repository.get(db, company_id, work_order_id)
         if work_order is None:
             return None
+
+        if "service_request_id" in data:
+            self._validate_service_request(db, company_id, data["service_request_id"])
 
         target_status = data.get("status")
         if target_status is not None:
