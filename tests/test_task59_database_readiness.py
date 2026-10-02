@@ -51,7 +51,7 @@ class Task59DatabaseReadinessTests(unittest.TestCase):
 
     def test_all_accepted_model_tables_and_columns_exist(self):
         inspector = inspect(self.engine)
-        self.assertEqual(set(inspector.get_table_names()), set(Base.metadata.tables))
+        self.assertEqual(set(inspector.get_table_names()), set(Base.metadata.tables) | {init_database.LEDGER})
         for table in Base.metadata.sorted_tables:
             self.assertEqual({col["name"] for col in inspector.get_columns(table.name)}, set(table.columns.keys()), table.name)
 

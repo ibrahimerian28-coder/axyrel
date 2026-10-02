@@ -271,12 +271,12 @@ Dependencies/Carry-forward: OD-20 defines isolated local PostgreSQL production-s
 
 ## Task 60 — Create Migrations
 
-Status: NEXT
-Dependencies/Carry-forward: Task 59 verified the existing twelve-file fresh-build chain. Current initializer has no migration ledger, is not safely repeatable as a general upgrade, and does not guarantee full-chain atomicity. Review tooling scope at the owner gate before introducing a new migration strategy.
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: OD-21 tracked numeric SQL migrations with raw SHA-256 checksums and per-migration atomic ledger records. See docs/task60_final_checkpoint.md and the updated Task 59 deployment procedure. Verify commit/push before continuing. Existing untracked schemas still require owner-approved reconciliation; no live production database changed.
 
 ## Task 61 — Create Required Indexes / Constraints
 
-Status: PENDING
+Status: NEXT
 
 ## Task 62 — Migrate Required Existing Data
 
