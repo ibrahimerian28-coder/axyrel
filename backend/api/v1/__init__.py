@@ -17,6 +17,7 @@ from backend.api.v1.service_history import router as service_history_router
 from backend.api.v1.service_requests import router as service_requests_router
 from backend.api.v1.service_visits import router as service_visits_router
 from backend.api.v1.technician_stock import router as technician_stock_router
+from backend.api.v1.technician_directory import router as technician_directory_router
 from backend.api.v1.work_orders import router as work_orders_router
 
 router = APIRouter()
@@ -35,6 +36,7 @@ for _router in (
     inventory_router,
     inventory_transactions_router,
     technician_stock_router,
+    technician_directory_router,
     notifications_router,
     audit_logs_router,
     profitability_router,
