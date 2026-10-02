@@ -14,7 +14,6 @@ SHEETS = {
     "Maintenance": "2120582392",
     "Inventory": "1767710106",
     "Expenses": "288947510",
-    "Store_Products": "1129472026",
     "Inventory_History": "26597140",
 }
 

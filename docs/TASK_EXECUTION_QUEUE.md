@@ -324,11 +324,13 @@ Carry-forward: Unused parts selector and legacy visit-history renderer removed; 
 
 ## Task 69 — Remove Obsolete Store Architecture
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Unused legacy Store_Products identifier removed; current inventory-backed catalog rendering, error/empty paths and imports verified. No checkout/order scope added. See docs/task69_final_checkpoint.md.
 
 ## Task 70 — Remove Obsolete Streamlit-to-Database Calls
 
-Status: PENDING
+Status: NEXT
 
 ## Task 71 — Unit Tests for Core Services
 
