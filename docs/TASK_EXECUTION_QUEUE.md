@@ -420,7 +420,9 @@ Carry-forward: Movement/rollback, thresholds and inventory valuation/summary con
 
 ## Task 85 — Validate Production Configuration
 
-Status: NEXT
+Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+
+Gate: No owner-approved production target/configuration; existing production validation helper is not invoked at startup. Clarify actual target validation versus offline readiness and security enforcement before acceptance. See docs/task85_owner_decision_required.md and docs/final_task80_90_run_status.md. Tasks 86–90 not started.
 
 ## Task 86 — Production Deployment
 
