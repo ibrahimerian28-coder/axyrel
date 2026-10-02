@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from backend.core.authentication import CurrentUser
+from backend.core.authentication import CurrentAuthContext
 from backend.core.authorization import Permission, require_permission
 from backend.core.database import get_db
 from backend.core.tenant import set_company_context
@@ -16,10 +16,10 @@ from backend.core.tenant import set_company_context
 DBSession = Annotated[Session, Depends(get_db)]
 
 
-def get_company_id(current_user: CurrentUser) -> UUID:
+def get_company_id(context: CurrentAuthContext) -> UUID:
     """Resolve tenant context exclusively from the authenticated user."""
-    set_company_context(current_user.company_id)
-    return current_user.company_id
+    set_company_context(context.company_id)
+    return context.company_id
 
 
 def require_api_permission(permission: Permission):

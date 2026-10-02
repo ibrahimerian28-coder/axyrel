@@ -6,7 +6,7 @@ from typing import Callable
 
 from fastapi import Depends, HTTPException, status
 
-from backend.core.authentication import CurrentUser
+from backend.core.authentication import CurrentAuthContext
 from backend.models.user import User
 
 
@@ -88,7 +88,8 @@ def require_permission(permission: Permission | str) -> Callable:
     """Create a FastAPI dependency backed by the authenticated DB user role."""
     required = Permission(permission)
 
-    def dependency(user: CurrentUser) -> User:
+    def dependency(context: CurrentAuthContext) -> User:
+        user = context.user
         try:
             role = Role(user.role)
         except ValueError as exc:

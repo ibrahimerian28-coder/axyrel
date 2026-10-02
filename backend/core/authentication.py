@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Annotated
+from dataclasses import dataclass
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
@@ -17,10 +18,21 @@ AuthenticationDBSession = Annotated[Session, Depends(get_db)]
 _authentication_service = AuthenticationService()
 
 
-def get_current_user(
+@dataclass(frozen=True)
+class AuthContext:
+    """Request-scoped identity validated against the database."""
+
+    user: User
+
+    @property
+    def company_id(self) -> UUID:
+        return self.user.company_id
+
+
+def get_auth_context(
     db: AuthenticationDBSession,
     token: Annotated[str, Depends(oauth2_scheme)],
-) -> User:
+) -> AuthContext:
     try:
         claims = decode_access_token(token)
     except Exception as exc:
@@ -54,7 +66,15 @@ def get_current_user(
             detail="User is inactive, company is inactive, or user no longer exists",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return user
+    return AuthContext(user=user)
+
+
+CurrentAuthContext = Annotated[AuthContext, Depends(get_auth_context)]
+
+
+def get_current_user(context: CurrentAuthContext) -> User:
+    """Preserve the ORM User return type for existing dependencies."""
+    return context.user
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]

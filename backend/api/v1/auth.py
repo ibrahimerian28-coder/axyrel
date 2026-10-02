@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends
 
 from backend.api.dependencies import DBSession
-from backend.core.authentication import CurrentUser
+from backend.core.authentication import CurrentAuthContext
 from backend.core.authorization import permissions_for_role, Role
 from backend.core.security import create_access_token
 from backend.schemas.auth import Token, UserRead
@@ -47,7 +47,8 @@ def login(db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @router.get("/me", response_model=UserRead)
-def me(current_user: CurrentUser):
+def me(context: CurrentAuthContext):
+    current_user = context.user
     role = Role(current_user.role)
     data = UserRead.model_validate(current_user).model_dump()
     data["permissions"] = [permission.value for permission in permissions_for_role(role)]
