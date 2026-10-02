@@ -348,11 +348,13 @@ Carry-forward: Resource authentication, tenant-isolated CRUD, UUID validation an
 
 ## Task 73 — Database / Repository Tests
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Actual migrated PostgreSQL repositories/tenant/rollback/reporting and Inventory live API 409/recovery verified. Other allowlisted live API conflicts remain unverified. See docs/task73_final_checkpoint.md. Stop after push verification at batch limit.
 
 ## Task 74 — Core Workflow Tests
 
-Status: PENDING
+Status: NEXT — NOT STARTED (three-task batch limit)
 
 ## Task 75 — Inventory Transaction Tests
 
