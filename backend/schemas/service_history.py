@@ -40,6 +40,11 @@ class ServiceHistoryUpdate(BaseModel):
     notes: str | None = None
     status: str | None = None
 
+    @field_validator("service_type", "summary")
+    @classmethod
+    def validate_required_text(cls, value: str | None) -> str | None:
+        return ServiceHistoryBase.validate_required_text(value) if value is not None else None
+
 
 class ServiceHistoryRead(ServiceHistoryBase):
     id: UUID

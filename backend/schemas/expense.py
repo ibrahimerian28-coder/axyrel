@@ -48,6 +48,11 @@ class ExpenseUpdate(BaseModel):
     notes: str | None = None
     status: str | None = None
 
+    @field_validator("category")
+    @classmethod
+    def validate_category(cls, value: str | None) -> str | None:
+        return ExpenseBase.validate_category(value) if value is not None else None
+
     @field_validator("amount")
     @classmethod
     def validate_amount(cls, value: Decimal | None) -> Decimal | None:

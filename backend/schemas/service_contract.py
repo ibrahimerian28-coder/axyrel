@@ -6,6 +6,11 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
+def validate_contract_dates(start_date: date, end_date: date | None) -> None:
+    if end_date is not None and end_date < start_date:
+        raise ValueError("end_date must be on or after start_date")
+
+
 class ServiceContractBase(BaseModel):
     customer_id: UUID
     contract_number: str = Field(min_length=1, max_length=50)
@@ -18,8 +23,7 @@ class ServiceContractBase(BaseModel):
 
     @model_validator(mode="after")
     def validate_dates(self):
-        if self.end_date is not None and self.end_date < self.start_date:
-            raise ValueError("end_date must be on or after start_date")
+        validate_contract_dates(self.start_date, self.end_date)
         return self
 
 

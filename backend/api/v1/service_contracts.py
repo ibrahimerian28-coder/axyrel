@@ -32,7 +32,10 @@ def create_record(payload: ServiceContractCreate, db: DBSession, company_id: Com
 
 @router.patch("/{contract_id}", response_model=ServiceContractRead, dependencies=[Depends(require_permission(Permission.BILLING_MANAGE))])
 def update_record(contract_id: UUID, payload: ServiceContractUpdate, db: DBSession, company_id: CompanyID):
-    record = service.update_contract(db, company_id, contract_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.update_contract(db, company_id, contract_id, payload.model_dump(exclude_unset=True))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if record is None:
         raise HTTPException(status_code=404, detail="service_contracts record not found")
     db.commit()

@@ -43,6 +43,11 @@ class InvoiceUpdate(BaseModel):
     paid_amount: Decimal | None = None
     notes: str | None = None
 
+    @field_validator("invoice_number")
+    @classmethod
+    def validate_invoice_number(cls, value: str | None) -> str | None:
+        return InvoiceBase.validate_invoice_number(value) if value is not None else None
+
 class InvoiceRead(InvoiceBase):
     id: UUID
     company_id: UUID

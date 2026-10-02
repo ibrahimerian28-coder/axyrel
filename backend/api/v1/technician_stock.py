@@ -23,9 +23,16 @@ def get_stock(stock_id: UUID, db: DBSession, company_id: CompanyID):
     return r
 @router.post("", status_code=201, dependencies=[Depends(require_permission(Permission.INVENTORY_MANAGE))])
 def create_stock(payload: StockCreate, db: DBSession, company_id: CompanyID):
-    r=service.create_stock(db, company_id, payload.model_dump()); db.commit(); db.refresh(r); return r
+    try:
+        r=service.create_stock(db, company_id, payload.model_dump())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    db.commit(); db.refresh(r); return r
 @router.patch("/{stock_id}", dependencies=[Depends(require_permission(Permission.INVENTORY_MANAGE))])
 def set_quantity(stock_id: UUID, payload: StockSetQuantity, db: DBSession, company_id: CompanyID):
-    r=service.set_quantity(db, company_id, stock_id, payload.quantity)
+    try:
+        r=service.set_quantity(db, company_id, stock_id, payload.quantity)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if r is None: raise HTTPException(404,"technician stock not found")
     db.commit(); db.refresh(r); return r

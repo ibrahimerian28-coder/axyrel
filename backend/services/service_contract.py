@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from backend.repositories.service_contract import ServiceContractRepository
+from backend.schemas.service_contract import validate_contract_dates
 
 
 class ServiceContractService:
@@ -32,6 +33,15 @@ class ServiceContractService:
         contract_id: UUID,
         data: dict,
     ):
+        record = self.repository.get(db, company_id, contract_id)
+        if record is None:
+            return None
+        if "start_date" in data or "end_date" in data:
+            start_date = data.get("start_date", record.start_date)
+            end_date = data.get("end_date", record.end_date)
+            # Required start_date null keeps the existing persistence semantics.
+            if start_date is not None:
+                validate_contract_dates(start_date, end_date)
         return self.repository.update(db, company_id, contract_id, data)
 
     def delete_contract(
