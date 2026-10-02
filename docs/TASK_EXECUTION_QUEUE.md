@@ -300,11 +300,13 @@ Dependencies/Carry-forward: Sheets CSV/Apps Script fallback removed; unused exte
 
 ## Task 65 — Remove Obsolete data_service Dependencies
 
-Status: NEXT — NOT STARTED (three-task batch limit)
+Status: DONE — ACCEPTED
+
+Carry-forward: Removed unused facade/consumer dependency group; active API routing and contracts verified. See docs/task65_final_checkpoint.md. Historical Task 64 facade tests replaced by current runtime dependency checks.
 
 ## Task 66 — Remove Obsolete Legacy Business Logic
 
-Status: PENDING
+Status: NEXT
 
 ## Task 67 — Remove Duplicated Business Logic
 
