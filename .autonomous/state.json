@@ -6,9 +6,9 @@
   "branch": "checkpoint/pre-gemini-task46",
   "last_completed_task": 88,
   "current_task": 89,
-  "current_task_status": "not_started",
-  "last_completed_commit": "HEAD",
-  "owner_decision_pending": false,
+  "current_task_status": "awaiting_owner_decision",
+  "last_completed_commit": "ce3e6eac517555e1081e719ccf41213e2820632a",
+  "owner_decision_pending": true,
   "batch": {
     "max_completed_tasks": 3,
     "completed_tasks_this_run": 9,

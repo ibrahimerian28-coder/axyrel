@@ -444,7 +444,9 @@ Carry-forward: OD-28 internal MVP launch-readiness review and owner handoff acce
 
 ## Task 89 — First Real-World Usage
 
-Status: NEXT
+Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+
+Gate: OD-28 permits internal readiness/handoff only, not real users/business data/onboarding/production. Clarify synthetic first-use acceptance or approve actual usage target/participants/data/actions. See docs/task89_owner_decision_required.md. Task 90 not started.
 
 ## Task 90 — Post-Launch Critical Fixes Only
 
