@@ -342,11 +342,13 @@ Carry-forward: Twelve isolated core-rule tests added; accepted integration cover
 
 ## Task 72 — API Tests
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Resource authentication, tenant-isolated CRUD, UUID validation and Audit immutability tested; Task 48/49 API contracts regressed. See docs/task72_final_checkpoint.md.
 
 ## Task 73 — Database / Repository Tests
 
-Status: PENDING
+Status: NEXT
 
 ## Task 74 — Core Workflow Tests
 
