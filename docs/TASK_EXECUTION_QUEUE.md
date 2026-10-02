@@ -438,13 +438,13 @@ Carry-forward: OD-27 local synthetic smoke passed, 5 checks including actual pro
 
 ## Task 88 — MVP Launch
 
-Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+Status: DONE — ACCEPTED
 
-Gate: Prior OD-25/26/27 scopes are offline/local only; actual production deployment and launch scope/audience are unapproved. Clarify internal readiness/handoff versus actual launch before acceptance. See docs/task88_owner_decision_required.md. Tasks 89–90 not started.
+Carry-forward: OD-28 internal MVP launch-readiness review and owner handoff accepted using prior evidence, no suite reruns or live/public launch. See docs/task88_final_checkpoint.md and docs/task88_mvp_owner_handoff.md. Production prerequisites remain explicit.
 
 ## Task 89 — First Real-World Usage
 
-Status: PENDING
+Status: NEXT
 
 ## Task 90 — Post-Launch Critical Fixes Only
 
