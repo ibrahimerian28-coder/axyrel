@@ -1,5 +1,7 @@
 # Task 87 — Owner Decision Required
 
+Historical pause report. Resolved by OD-27's local synthetic smoke authority; see task87_final_checkpoint.md for subsequent acceptance. The original live production boundary below remains applicable to a future actual deployment.
+
 Date: 2026-10-02. Official title: **Production Smoke Test**.
 Status: ANALYSIS COMPLETE — NOT ACCEPTED; smoke implementation not started.
 Last accepted Task 86 commit 5bc2185fb3fd35e858b686b8b4c7beeaf8d28332; clean local/tracking/actual remote verified before analysis. Branch checkpoint/pre-gemini-task46; main unchanged at e8accb377e6f0c32cc919463466ae9ba97995c06.
