@@ -384,11 +384,13 @@ Carry-forward: Fifteen-resource PostgreSQL read/mutation matrices and selected e
 
 ## Task 79 — Fix Critical Bugs
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Bounded critical regression audit passed 88 checks with no confirmed blocking defect in scope; no runtime repair required. Existing limitations retained. See docs/task79_final_checkpoint.md. Stop after push verification at batch limit.
 
 ## Task 80 — Validate Core User Workflows
 
-Status: PENDING
+Status: NEXT
 
 ## Task 81 — Validate Database Integrity
 
