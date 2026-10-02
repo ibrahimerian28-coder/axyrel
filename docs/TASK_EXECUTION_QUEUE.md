@@ -246,11 +246,13 @@ Dependencies/Carry-forward: OD-16 Option A implemented; see docs/task54_final_ch
 
 ## Task 55 — Work Order → Inventory Integration
 
-Status: NEXT
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: Existing accepted Work Order → Service Visit → inventory workflow verified with order-level acceptance tests; see docs/task55_final_checkpoint.md. No new direct consumption path or production behavior change. Verify commit/push; this is the third/final task of the resumed batch.
 
 ## Task 56 — Work Order → Billing Integration
 
-Status: PENDING
+Status: NEXT
+Dependencies/Carry-forward: Not started. Current autonomous batch stops after Task 55 under the three-task limit.
 
 ## Task 57 — Expenses → Profitability Integration
 
