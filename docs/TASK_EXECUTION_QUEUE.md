@@ -432,7 +432,9 @@ Carry-forward: OD-26 offline production deployment rehearsal/readiness verified,
 
 ## Task 87 — Production Smoke Test
 
-Status: NEXT
+Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+
+Gate: No actual production deployment exists; OD-26 accepts only Task 86 rehearsal. Task 87 requires explicit local/synthetic smoke substitution or approved actual target/access. See docs/task87_owner_decision_required.md. Tasks 88–90 not started.
 
 ## Task 88 — MVP Launch
 
