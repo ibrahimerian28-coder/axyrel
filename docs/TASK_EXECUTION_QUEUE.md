@@ -372,11 +372,13 @@ Carry-forward: Migrated PostgreSQL financial API semantics, tenant/reporting iso
 
 ## Task 77 — Authentication / Authorization Tests
 
-Status: NEXT — NOT STARTED (three-task batch limit)
+Status: DONE — ACCEPTED
+
+Carry-forward: Literal resource role matrices and established auth/context regressions verified; database roles remain authoritative. See docs/task77_final_checkpoint.md.
 
 ## Task 78 — Tenant Isolation Tests
 
-Status: PENDING
+Status: NEXT
 
 ## Task 79 — Fix Critical Bugs
 

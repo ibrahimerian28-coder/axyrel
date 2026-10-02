@@ -4,14 +4,14 @@
   "execution_mode": "local",
   "project_root": "D:\\Axyrel_BACKUP_BEFORE_GEMINI",
   "branch": "checkpoint/pre-gemini-task46",
-  "last_completed_task": 76,
-  "current_task": 77,
+  "last_completed_task": 77,
+  "current_task": 78,
   "current_task_status": "not_started",
   "last_completed_commit": "HEAD",
   "owner_decision_pending": false,
   "batch": {
     "max_completed_tasks": 3,
-    "completed_tasks_this_run": 3
+    "completed_tasks_this_run": 1
   },
   "usage_policy": {
     "stop_threshold_percent_if_reliably_available": 20,
