@@ -288,11 +288,13 @@ Dependencies/Carry-forward: Existing Inventory mapping and synthetic PostgreSQL 
 
 ## Task 63 — Validate Migrated Data
 
-Status: NEXT
+Status: DONE — ACCEPTED (OD-23 synthetic validation/readiness only)
+
+Dependencies/Carry-forward: Independent literal source-to-target expectations, tenant partitions, generated references and repeatability verified with Task 62 regression. No real data validated. See docs/task63_final_checkpoint.md; real-data policies remain unresolved under OD-22/23.
 
 ## Task 64 — Remove Obsolete Google Sheets Persistence
 
-Status: PENDING
+Status: NEXT
 
 ## Task 65 — Remove Obsolete data_service Dependencies
 
