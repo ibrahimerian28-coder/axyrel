@@ -360,11 +360,13 @@ Carry-forward: Linked synthetic API journey, failure integrity and tenant isolat
 
 ## Task 75 — Inventory Transaction Tests
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Migrated PostgreSQL stock movement, rejection, reference and transaction rollback cases verified with repository regressions. Preserve existing zero-adjustment/generic-record semantics. See docs/task75_final_checkpoint.md.
 
 ## Task 76 — Billing / Expense / Profitability Tests
 
-Status: PENDING
+Status: NEXT
 
 ## Task 77 — Authentication / Authorization Tests
 
