@@ -426,13 +426,13 @@ Carry-forward: OD-25 offline production configuration/security readiness verifie
 
 ## Task 86 — Production Deployment
 
-Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+Status: DONE — ACCEPTED
 
-Gate: OD-25 approves only Task 85 offline readiness; actual production target, deployment/security requirements and necessary actions/access are unapproved. No deployment attempted; Task 87–90 not started. See docs/task86_owner_decision_required.md.
+Carry-forward: OD-26 offline production deployment rehearsal/readiness verified, 19 checks passed. Actual tracked PostgreSQL, production-mode loopback API starts/shutdown and UI script startup; no live deployment. See docs/task86_final_checkpoint.md and docs/task86_future_deployment_procedure.md.
 
 ## Task 87 — Production Smoke Test
 
-Status: PENDING
+Status: NEXT
 
 ## Task 88 — MVP Launch
 
