@@ -266,12 +266,13 @@ Dependencies/Carry-forward: OD-19 Option A verified existing explicit API flows,
 
 ## Task 59 — Create Production Database
 
-Status: NEXT
-Dependencies/Carry-forward: Not started. Current batch stops after Task 58 under the three-task limit. Production work remains subject to the protocol's database/owner-decision gates.
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: OD-20 defines isolated local PostgreSQL production-schema readiness, not live deployment. Complete accepted SQL chain and schema verified; see docs/task59_final_checkpoint.md and docs/task59_database_creation_procedure.md. Verify commit/push before continuing. No real production target, credentials or data modified.
 
 ## Task 60 — Create Migrations
 
-Status: PENDING
+Status: NEXT
+Dependencies/Carry-forward: Task 59 verified the existing twelve-file fresh-build chain. Current initializer has no migration ledger, is not safely repeatable as a general upgrade, and does not guarantee full-chain atomicity. Review tooling scope at the owner gate before introducing a new migration strategy.
 
 ## Task 61 — Create Required Indexes / Constraints
 
