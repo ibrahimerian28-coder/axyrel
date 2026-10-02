@@ -408,11 +408,13 @@ Carry-forward: Existing role/resource matrices and canonical database-authoritat
 
 ## Task 83 — Validate Financial Calculations
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Accepted invoice and separate reporting calculation policies passed 31 checks on synthetic fixtures; no accounting-policy change. See docs/task83_final_checkpoint.md.
 
 ## Task 84 — Validate Inventory Calculations
 
-Status: PENDING
+Status: NEXT
 
 ## Task 85 — Validate Production Configuration
 
