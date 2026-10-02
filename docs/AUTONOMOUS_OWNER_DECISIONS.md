@@ -43,4 +43,8 @@ Date: 2026-10-02. Later explicit owner decisions override older conflicting word
 
 OD-07's policy is unchanged. Its historical lack of isolated live PostgreSQL integration is now narrowed by Task 73 evidence: a real Inventory same-company duplicate, through the accepted repository/API exception handler on a migrated disposable PostgreSQL database, returned the exact allowlisted 409 and a subsequent request succeeded. Invoice uniqueness also produced real SQLSTATE 23505 and its named constraint in a repository test. Full live API conflict coverage for Invoice, Technician Stock and Service Contract remains unverified; do not claim all classifier paths are closed. See docs/task73_final_checkpoint.md. This is new test evidence, not a new owner policy.
 
+## Verification update — Task 76
+
+Task 76 adds full isolated live PostgreSQL Invoice API uniqueness evidence: an actual same-company duplicate returns the exact accepted 409, leaves only one duplicate-number record and permits a following write. This narrows the earlier Task 73 evidence limitation for Invoice. Inventory and Invoice live API classifier paths are now verified; Technician Stock and Service Contract live API conflict paths remain unverified. OD-07 classification policy is unchanged. See docs/task76_final_checkpoint.md.
+
 Sources: explicit bootstrap/roadmap clarification and subsequent owner decisions, including Task 62 synthetic-only rehearsal (OD-22) and Task 63 synthetic-only validation (OD-23); .cursorrules.md Design Freeze and architecture; docs/task46_final_checkpoint.md; docs/task47_final_checkpoint.md; docs/task48_final_checkpoint.md; docs/task49_final_checkpoint.md. Do not repeatedly request decisions already settled here.

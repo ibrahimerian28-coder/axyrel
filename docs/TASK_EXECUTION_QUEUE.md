@@ -366,11 +366,13 @@ Carry-forward: Migrated PostgreSQL stock movement, rejection, reference and tran
 
 ## Task 76 — Billing / Expense / Profitability Tests
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Migrated PostgreSQL financial API semantics, tenant/reporting isolation and actual Invoice 409/recovery verified with Task 56/57 regressions. Stock/Contract full live API conflicts remain unverified. See docs/task76_final_checkpoint.md. Stop after push verification at batch limit.
 
 ## Task 77 — Authentication / Authorization Tests
 
-Status: PENDING
+Status: NEXT — NOT STARTED (three-task batch limit)
 
 ## Task 78 — Tenant Isolation Tests
 
