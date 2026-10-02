@@ -414,11 +414,13 @@ Carry-forward: Accepted invoice and separate reporting calculation policies pass
 
 ## Task 84 — Validate Inventory Calculations
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Movement/rollback, thresholds and inventory valuation/summary contracts passed 28 checks; accepted encoding/presentation semantics preserved. See docs/task84_final_checkpoint.md.
 
 ## Task 85 — Validate Production Configuration
 
-Status: PENDING
+Status: NEXT
 
 ## Task 86 — Production Deployment
 
