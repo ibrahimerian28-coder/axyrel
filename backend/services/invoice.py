@@ -1,5 +1,6 @@
 """Business service for tenant-scoped billing and invoices."""
 from uuid import UUID
+from decimal import Decimal
 from sqlalchemy.orm import Session
 from backend.repositories.invoice import InvoiceRepository
 
@@ -11,6 +12,11 @@ class InvoiceService:
     def get_invoice(self, db: Session, company_id: UUID | None, invoice_id: UUID):
         return self.repository.get(db, company_id, invoice_id)
     def create_invoice(self, db: Session, company_id: UUID | None, data: dict):
+        if "total" not in data:
+            subtotal = Decimal(str(data.get("subtotal", "0")))
+            discount = Decimal(str(data.get("discount", "0")))
+            tax = Decimal(str(data.get("tax", "0")))
+            data = {**data, "total": max(Decimal("0"), subtotal - discount + tax)}
         return self.repository.create(db, company_id, data)
     def update_invoice(self, db: Session, company_id: UUID | None, invoice_id: UUID, data: dict):
         return self.repository.update(db, company_id, invoice_id, data)

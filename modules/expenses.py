@@ -1,15 +1,15 @@
 from __future__ import annotations
 from datetime import date
 import streamlit as st
-from utils.api_client import create_record, delete_record, list_records, update_record
+from utils.api_client import create_record, delete_record, list_records, request, update_record
 from utils.ui import api_call, as_frame, money
 
 
 def app() -> None:
     st.title("💵 Expenses")
     expenses=api_call(list_records,"expenses") or []
-    total=sum(float(x.get("amount",0)) for x in expenses)
-    c1,c2=st.columns(2); c1.metric("Expenses",len(expenses)); c2.metric("Total",money(total))
+    summary=api_call(lambda: request("GET","/expenses/summary")) or {}
+    c1,c2=st.columns(2); c1.metric("Expenses",len(expenses)); c2.metric("Total",money(summary.get("total_amount",0)))
     with st.expander("➕ Add expense"):
         with st.form("add_expense"):
             category=st.text_input("Category *"); desc=st.text_input("Description"); amount=st.number_input("Amount",min_value=0.0,step=10.0); d=st.date_input("Date",value=date.today()); method=st.selectbox("Payment method",["Cash","Bank","Card","Transfer","Other"]); vendor=st.text_input("Vendor"); notes=st.text_area("Notes")

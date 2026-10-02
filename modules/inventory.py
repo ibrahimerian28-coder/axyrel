@@ -7,12 +7,9 @@ from utils.ui import api_call, as_frame, money
 def app() -> None:
     st.title("📦 Inventory")
     items = api_call(list_records, "inventory") or []
-    df = as_frame(items)
-    if not df.empty:
-        df["stock_value"] = df["quantity"] * df["cost_price"]
-    low = sum(int(i.get("quantity", 0)) <= int(i.get("min_limit", 0)) for i in items)
-    total_value = sum(float(i.get("quantity", 0)) * float(i.get("cost_price", 0)) for i in items)
-    c1,c2,c3 = st.columns(3); c1.metric("Items", len(items)); c2.metric("Low stock", low); c3.metric("Stock value", money(total_value))
+    summary = api_call(lambda: request("GET", "/inventory/summary")) or {}
+    low_stock_item_ids = set(summary.get("low_stock_item_ids", []))
+    c1,c2,c3 = st.columns(3); c1.metric("Items", summary.get("item_count", 0)); c2.metric("Low stock", summary.get("low_stock_count", 0)); c3.metric("Stock value", money(summary.get("total_stock_value", 0)))
 
     with st.expander("➕ Add inventory item"):
         with st.form("add_inventory"):
@@ -32,7 +29,7 @@ def app() -> None:
     if search: items = api_call(list_records,"inventory",search=search) or []
     for item in items:
         iid=str(item["id"]); qty=int(item.get("quantity",0)); minimum=int(item.get("min_limit",0))
-        with st.expander(f"{item.get('item_name','')} · Qty {qty} · {'🔴 Low' if qty <= minimum else '🟢 Good'}"):
+        with st.expander(f"{item.get('item_name','')} · Qty {qty} · {'🔴 Low' if iid in low_stock_item_ids else '🟢 Good'}"):
             st.write(f"Cost: {money(item.get('cost_price'))} · Min: {minimum} · Ideal: {item.get('ideal_stock',0)}")
             c1,c2,c3=st.columns(3)
             with c1:

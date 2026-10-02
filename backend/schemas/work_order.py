@@ -44,3 +44,7 @@ class WorkOrderRead(WorkOrderBase):
     display_id: int | None = None
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+
+class WorkOrderSummary(BaseModel):
+    open_count: int

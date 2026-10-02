@@ -26,7 +26,10 @@ def get_record(customer_id: UUID, db: DBSession, company_id: CompanyID):
 
 @router.post("", response_model=CustomerRead, status_code=201, dependencies=[Depends(require_permission(Permission.CUSTOMER_MANAGE))])
 def create_record(payload: CustomerCreate, db: DBSession, company_id: CompanyID):
-    record = service.create_customer(db, company_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.create_customer(db, company_id, payload.model_dump(exclude_unset=True))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     db.commit()
     db.refresh(record)
     return record

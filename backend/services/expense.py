@@ -1,9 +1,11 @@
 """Business service for tenant-scoped expense records."""
 from uuid import UUID
+from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
 from backend.repositories.expense import ExpenseRepository
+from backend.schemas.expense import ExpenseSummary
 
 
 class ExpenseService:
@@ -15,6 +17,12 @@ class ExpenseService:
 
     def get_expense(self, db: Session, company_id: UUID | None, expense_id: UUID):
         return self.repository.get(db, company_id, expense_id)
+
+    def get_summary(self, db: Session, company_id: UUID | None) -> ExpenseSummary:
+        expenses = self.repository.list(db, company_id)
+        return ExpenseSummary(
+            total_amount=sum((expense.amount for expense in expenses), Decimal("0"))
+        )
 
     def create_expense(self, db: Session, company_id: UUID | None, data: dict):
         return self.repository.create(db, company_id, data)

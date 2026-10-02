@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from backend.repositories.service_visit import ServiceVisitRepository
 from backend.repositories.work_order import WorkOrderRepository
+from backend.schemas.work_order import WorkOrderSummary
 from backend.services.service_visit import ServiceVisitService
 from backend.services.status_lifecycle import ensure_work_order_transition
 
@@ -46,6 +47,15 @@ class WorkOrderService:
             status,
             assigned_technician_id,
             search,
+        )
+
+    def get_summary(self, db: Session, company_id: UUID | None) -> WorkOrderSummary:
+        work_orders = self.repository.list(db, company_id)
+        return WorkOrderSummary(
+            open_count=sum(
+                order.status not in {"Completed", "Closed", "Deleted"}
+                for order in work_orders
+            )
         )
 
     def get_work_order(self, db: Session, company_id: UUID | None, work_order_id: UUID):

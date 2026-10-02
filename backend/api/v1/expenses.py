@@ -4,7 +4,7 @@ from uuid import UUID
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from backend.services.expense import ExpenseService
-from backend.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseRead
+from backend.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseRead, ExpenseSummary
 from backend.api.dependencies import DBSession, CompanyID
 from backend.core.authorization import Permission, require_permission
 
@@ -15,6 +15,10 @@ service = ExpenseService()
 def list_records(db: DBSession, company_id: CompanyID, ):
     kwargs = {}
     return service.list_expenses(db, company_id, **kwargs)
+
+@router.get("/summary", response_model=ExpenseSummary, dependencies=[Depends(require_permission(Permission.EXPENSE_READ))])
+def get_summary(db: DBSession, company_id: CompanyID):
+    return service.get_summary(db, company_id)
 
 @router.get("/{expense_id}", response_model=ExpenseRead, dependencies=[Depends(require_permission(Permission.EXPENSE_READ))])
 def get_record(expense_id: UUID, db: DBSession, company_id: CompanyID):

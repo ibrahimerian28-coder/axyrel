@@ -15,6 +15,10 @@ class CustomerService:
         return self.repository.get(db, company_id, customer_id)
 
     def create_customer(self, db, company_id, data):
+        name = data["name"].strip()
+        if not name:
+            raise ValueError("Name is required.")
+        data = {**data, "name": name}
         return self.repository.create(db, company_id, data)
 
     def update_customer(self, db, company_id, customer_id, data):

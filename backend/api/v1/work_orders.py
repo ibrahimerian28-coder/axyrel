@@ -4,7 +4,7 @@ from uuid import UUID
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from backend.services.work_order import WorkOrderService
-from backend.schemas.work_order import WorkOrderCreate, WorkOrderUpdate, WorkOrderRead
+from backend.schemas.work_order import WorkOrderCreate, WorkOrderUpdate, WorkOrderRead, WorkOrderSummary
 from backend.api.dependencies import DBSession, CompanyID
 from backend.core.authorization import Permission, require_permission
 
@@ -21,6 +21,10 @@ def list_records(db: DBSession, company_id: CompanyID, customer_id: UUID | None 
     kwargs["assigned_technician_id"] = assigned_technician_id
     kwargs["search"] = search
     return service.list_work_orders(db, company_id, **kwargs)
+
+@router.get("/summary", response_model=WorkOrderSummary, dependencies=[Depends(require_permission(Permission.SERVICE_READ))])
+def get_summary(db: DBSession, company_id: CompanyID):
+    return service.get_summary(db, company_id)
 
 @router.get("/{work_order_id}", response_model=WorkOrderRead, dependencies=[Depends(require_permission(Permission.SERVICE_READ))])
 def get_record(work_order_id: UUID, db: DBSession, company_id: CompanyID):

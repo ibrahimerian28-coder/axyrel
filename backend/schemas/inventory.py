@@ -31,3 +31,10 @@ class InventoryItemRead(InventoryItemBase):
     id: UUID
     company_id: UUID
     model_config = ConfigDict(from_attributes=True)
+
+
+class InventorySummary(BaseModel):
+    item_count: int
+    low_stock_count: int
+    total_stock_value: Decimal
+    low_stock_item_ids: list[UUID]
