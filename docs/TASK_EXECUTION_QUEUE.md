@@ -282,11 +282,13 @@ Dependencies/Carry-forward: Migration 014 adds the three missing existing model-
 
 ## Task 62 — Migrate Required Existing Data
 
-Status: NEXT — NOT STARTED (three-task batch limit)
+Status: DONE — ACCEPTED (OD-22 synthetic rehearsal/readiness only; no real data migrated)
+
+Dependencies/Carry-forward: Existing Inventory mapping and synthetic PostgreSQL persistence/integrity verified. Expenses and other real-source mappings remain unresolved. See docs/task62_synthetic_migration_rehearsal.md and docs/task62_final_checkpoint.md. Preserve OD-21 tracking and OD-22 real-data deferral.
 
 ## Task 63 — Validate Migrated Data
 
-Status: PENDING
+Status: NEXT
 
 ## Task 64 — Remove Obsolete Google Sheets Persistence
 
