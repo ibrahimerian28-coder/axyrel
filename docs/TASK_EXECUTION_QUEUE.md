@@ -426,7 +426,9 @@ Carry-forward: OD-25 offline production configuration/security readiness verifie
 
 ## Task 86 — Production Deployment
 
-Status: NEXT
+Status: OWNER DECISION REQUIRED — NOT ACCEPTED
+
+Gate: OD-25 approves only Task 85 offline readiness; actual production target, deployment/security requirements and necessary actions/access are unapproved. No deployment attempted; Task 87–90 not started. See docs/task86_owner_decision_required.md.
 
 ## Task 87 — Production Smoke Test
 
