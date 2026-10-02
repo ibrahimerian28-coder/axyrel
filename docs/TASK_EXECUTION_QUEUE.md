@@ -276,11 +276,13 @@ Dependencies/Carry-forward: OD-21 tracked numeric SQL migrations with raw SHA-25
 
 ## Task 61 — Create Required Indexes / Constraints
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Dependencies/Carry-forward: Migration 014 adds the three missing existing model-declared non-unique indexes. Existing primary/foreign keys, named uniqueness and inventory checks verified on disposable PostgreSQL. See docs/task61_final_checkpoint.md. Verify commit/push before stopping at the three-task batch limit.
 
 ## Task 62 — Migrate Required Existing Data
 
-Status: PENDING
+Status: NEXT — NOT STARTED (three-task batch limit)
 
 ## Task 63 — Validate Migrated Data
 
