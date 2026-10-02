@@ -231,13 +231,13 @@ Dependencies/Carry-forward: Owner Option A recorded in OD-13; see docs/task51_fi
 
 ## Task 52 — Work Order → Scheduling Integration
 
-Status: NEXT
-Dependencies/Carry-forward: Resolve/adopt the official Axyrel Date/Time & Timezone policy before Scheduling integration final acceptance; resolve outstanding Schedule effective-state timestamp validation under that policy.
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: OD-14 adopted; Schedule effective-state validation and reviewed event-only TIMESTAMPTZ migration verified on disposable PostgreSQL. See docs/task52_final_checkpoint.md and docs/task52_timezone_migration.md. Verify task commit/push; production migration was not executed.
 
 ## Task 53 — Scheduling → Service Visit Integration
 
-Status: PENDING
-Dependencies/Carry-forward: Verify/apply the approved Task 52 timezone policy to Service Visit integration; resolve outstanding Service Visit effective-state timestamp validation.
+Status: NEXT
+Dependencies/Carry-forward: Apply OD-14 to Service Visit integration and actual_start_at/actual_end_at; resolve outstanding effective-state timestamp validation and review/test its targeted migration. No implementation started. Current batch stops after Task 52 (three finalized tasks).
 
 ## Task 54 — Service Visit → Service History Integration
 

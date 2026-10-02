@@ -20,8 +20,8 @@ class Schedule(Base):
         ForeignKey("work_orders.id"), nullable=False, index=True
     )
     technician_id: Mapped[UUID | None] = mapped_column(nullable=True, index=True)
-    start_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
-    end_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    start_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    end_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[str] = mapped_column(String(30), default="Scheduled", nullable=False, index=True)
     notes: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
