@@ -1,6 +1,29 @@
-# Axyrel Frontend v1 — Phase 1
+# Axyrel Frontend v1 — Local Review
 
-Owner-approved separate frontend phase; not Task 91. Historical Tasks 1–90 and Streamlit remain unchanged. This foundation provides login/session handling, typed API forwarding, React Query, responsive/RTL-ready navigation and shared loading/error/empty/permission states. Domain entries are labelled later-phase placeholders; Dashboard/Customers/Assets screens are not implemented.
+Owner-approved separate frontend phase; not Task 91. Historical Tasks 1–90 and Streamlit remain unchanged. Phase 1 provides login/session handling, typed API forwarding, React Query and shared states. Phase 2 adds Dashboard, Customers and Assets, linked profiles, supported create/edit forms and explicit phone actions. Other domains remain labelled later-phase placeholders, including destinations reached from related-record context. No later domain implementation or production deployment.
+
+## Owner visual review with synthetic data only
+
+Terminal 1, from repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -B frontend\tests\phase2-api.py
+```
+
+This runs the real accepted FastAPI on 127.0.0.1:8110 against a new disposable SQLite database with synthetic records. It changes working directory before backend import and explicitly sets the test database/environment; no workspace .env, configured application database, production data or credentials are used. This verifies UI/API integration, not a fresh PostgreSQL migration/deployment. Ctrl+C gracefully closes the API and disposes its temporary database.
+
+Terminal 2:
+
+```powershell
+Set-Location frontend
+$env:AXYREL_BACKEND_URL = "http://127.0.0.1:8110"
+$env:AXYREL_FRONTEND_ORIGIN = "http://127.0.0.1:3000"
+npm.cmd run dev -- --port 3000
+```
+
+Open http://127.0.0.1:3000/login. Synthetic review account: admin@example.test / synthetic-password. Optional read-only presentation account: technician@example.test / synthetic-password. These are test-only identities, never production credentials. Navigate to Dashboard, Customers and Assets; adding/editing records affects only that temporary database. Local phone numbers require an explicit international format for WhatsApp; no country is guessed. Stop both terminals with Ctrl+C when done.
+
+Focused integration command from frontend: `npm.cmd run test:phase2`; production-built Next on loopback 3101 plus actual synthetic FastAPI 8110. Foundation regression command uses its separate synthetic contract server. Both harnesses refuse to reuse existing servers on their ports.
 
 ## Local commands
 

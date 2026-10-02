@@ -11,7 +11,7 @@ test("login, role navigation, unchanged logo and logout session cleanup", async 
   expect(await page.evaluate(() => localStorage.length)).toBe(0);
   const image = page.locator(".brand-image"); await expect(image).toHaveAttribute("src", "/brand/axyrel-logo.png");
   expect(await image.evaluate((img: HTMLImageElement) => img.naturalWidth > 0 && Math.abs(img.width / img.height - img.naturalWidth / img.naturalHeight) < 0.02)).toBe(true);
-  await page.getByRole("button", { name: "Customers", exact: true }).click(); await expect(page.getByRole("heading", { name: "Customers is planned for a later phase" })).toBeVisible();
+  await page.getByRole("button", { name: "Schedule", exact: true }).click(); await expect(page.getByRole("heading", { name: "Schedule is planned for a later phase" })).toBeVisible();
   await page.getByRole("button", { name: "Sign out" }).click(); await expect(page).toHaveURL(/\/login$/); expect((await context.cookies()).some(c => c.name === "axyrel_session")).toBe(false);
   await login(page, "technician"); await expect(page.getByText("Synthetic Technician", { exact: true })).toBeVisible(); await expect(page.getByRole("button", { name: "Invoices", exact: true })).toHaveCount(0);
 });
