@@ -390,11 +390,13 @@ Carry-forward: Bounded critical regression audit passed 88 checks with no confir
 
 ## Task 80 — Validate Core User Workflows
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Accepted API journey and stock lifecycle validation passed 16 checks; synthetic/disposable scope and OD-24 final-run exception recorded. See docs/task80_final_checkpoint.md.
 
 ## Task 81 — Validate Database Integrity
 
-Status: PENDING
+Status: NEXT
 
 ## Task 82 — Validate Permissions
 
