@@ -261,11 +261,13 @@ Dependencies/Carry-forward: OD-18 confirms Active-only Profitability expenses an
 
 ## Task 58 — Notifications / Audit Integration
 
-Status: NEXT
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: OD-19 Option A verified existing explicit API flows, tenant isolation, Notification state and Audit API/service immutability; see docs/task58_final_checkpoint.md. Automatic event generation remains deferred. Verify commit/push; third/final task of this resumed batch.
 
 ## Task 59 — Create Production Database
 
-Status: PENDING
+Status: NEXT
+Dependencies/Carry-forward: Not started. Current batch stops after Task 58 under the three-task limit. Production work remains subject to the protocol's database/owner-decision gates.
 
 ## Task 60 — Create Migrations
 
