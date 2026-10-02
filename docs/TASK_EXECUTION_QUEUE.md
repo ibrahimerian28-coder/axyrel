@@ -312,11 +312,13 @@ Carry-forward: Unused legacy visit prediction and float coercion helpers removed
 
 ## Task 67 — Remove Duplicated Business Logic
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Customer/Inventory CREATE-only trim/blank rule consolidated internally with exact messages and unchanged PATCH behavior. See docs/task67_final_checkpoint.md. Stop after push verification at the three-task batch limit.
 
 ## Task 68 — Remove Obsolete Maintenance Architecture
 
-Status: PENDING
+Status: NEXT — NOT STARTED (three-task batch limit)
 
 ## Task 69 — Remove Obsolete Store Architecture
 

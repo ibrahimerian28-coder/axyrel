@@ -3,6 +3,7 @@ from uuid import UUID
 from dateutil.relativedelta import relativedelta
 from sqlalchemy.orm import Session
 from backend.repositories.customer import CustomerRepository
+from backend.services.create_text import trimmed_required_text
 
 class CustomerService:
     def __init__(self, repository=None):
@@ -15,9 +16,7 @@ class CustomerService:
         return self.repository.get(db, company_id, customer_id)
 
     def create_customer(self, db, company_id, data):
-        name = data["name"].strip()
-        if not name:
-            raise ValueError("Name is required.")
+        name = trimmed_required_text(data["name"], "Name is required.")
         data = {**data, "name": name}
         return self.repository.create(db, company_id, data)
 

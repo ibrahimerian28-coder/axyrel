@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from backend.repositories.inventory import InventoryRepository
 from backend.schemas.inventory import InventorySummary
 from backend.services.inventory_rules import InventoryBusinessRules
+from backend.services.create_text import trimmed_required_text
 
 
 class InventoryService:
@@ -57,9 +58,7 @@ class InventoryService:
         company_id: UUID | None,
         data: dict,
     ):
-        item_name = data["item_name"].strip()
-        if not item_name:
-            raise ValueError("Item name is required.")
+        item_name = trimmed_required_text(data["item_name"], "Item name is required.")
         data = {**data, "item_name": item_name}
         return self.repository.create(db, company_id, data)
 
