@@ -378,11 +378,13 @@ Carry-forward: Literal resource role matrices and established auth/context regre
 
 ## Task 78 — Tenant Isolation Tests
 
-Status: NEXT
+Status: DONE — ACCEPTED
+
+Carry-forward: Fifteen-resource PostgreSQL read/mutation matrices and selected explicit company-write attempts verified with repository regressions. Scope limitations explicit. See docs/task78_final_checkpoint.md.
 
 ## Task 79 — Fix Critical Bugs
 
-Status: PENDING
+Status: NEXT
 
 ## Task 80 — Validate Core User Workflows
 
