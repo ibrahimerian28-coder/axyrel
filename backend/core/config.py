@@ -5,6 +5,8 @@ environment-specific values are loaded from environment variables/.env and
 must not be hard-coded in source code.
 """
 from functools import lru_cache
+from sqlalchemy.engine import make_url
+from sqlalchemy.exc import ArgumentError
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -43,21 +45,36 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
+        hide_input_in_errors=True,
     )
 
     def validate_production_security(self) -> None:
         """Reject insecure development defaults when running in production."""
-        if self.environment.lower() == "production":
-            if self.secret_key == "change-me-in-production":
+        if self.environment.strip().lower() == "production":
+            if not self.secret_key.strip() or self.secret_key.strip() == "change-me-in-production":
                 raise ValueError("SECRET_KEY must be changed in production.")
-            if "localhost" in self.database_url:
+            if "localhost" in self.database_url.lower():
                 raise ValueError("DATABASE_URL must not point to localhost in production.")
+            try:
+                url = make_url(self.database_url)
+                valid = url.get_backend_name() == "postgresql" and bool(url.host) and bool(url.database)
+                _ = url.port  # Reject an invalid port without echoing the URL.
+            except (ValueError, TypeError, ArgumentError):
+                valid = False
+            if not valid:
+                raise ValueError("DATABASE_URL must be a valid PostgreSQL URL in production.")
 
 
 @lru_cache
 def get_settings() -> Settings:
     """Return the cached application settings instance."""
-    return Settings()
+    try:
+        configuration = Settings()
+        configuration.validate_production_security()
+    except ValueError:
+        # Settings validation may contain sensitive inputs; startup errors must not.
+        raise RuntimeError("Invalid application configuration.") from None
+    return configuration
 
 
 settings = get_settings()

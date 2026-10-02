@@ -1,5 +1,7 @@
 # Task 85 — Owner Decision Required
 
+Historical pause report. Resolved by OD-25: offline/synthetic readiness and startup enforcement approved. See task85_final_checkpoint.md for subsequent acceptance evidence. The original evidence below describes the pre-repair checkpoint; actual production deployment remains separately gated.
+
 Date: 2026-10-02. Official title: **Validate Production Configuration**.
 Status: ANALYSIS COMPLETE — NOT ACCEPTED; awaiting owner decision.
 Last accepted task: Task 84, commit 28f96573a6ccf97a6e4d2f4c6725d91571dbd50c. Clean local/tracking/actual remote equality verified. Branch checkpoint/pre-gemini-task46; main unchanged at e8accb377e6f0c32cc919463466ae9ba97995c06.
