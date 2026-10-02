@@ -354,11 +354,13 @@ Carry-forward: Actual migrated PostgreSQL repositories/tenant/rollback/reporting
 
 ## Task 74 — Core Workflow Tests
 
-Status: NEXT — NOT STARTED (three-task batch limit)
+Status: DONE — ACCEPTED
+
+Carry-forward: Linked synthetic API journey, failure integrity and tenant isolation verified alongside Work Order inventory lifecycle regression. See docs/task74_final_checkpoint.md.
 
 ## Task 75 — Inventory Transaction Tests
 
-Status: PENDING
+Status: NEXT
 
 ## Task 76 — Billing / Expense / Profitability Tests
 
