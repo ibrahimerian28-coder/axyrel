@@ -19,6 +19,8 @@ Profitability is a reporting/derived domain. Persisting a duplicate total would 
 ## Legacy note
 The legacy `modules/profits.py` is only a Streamlit placeholder and does not expose reliable calculation rules. Therefore the rules above are an explicit domain inference for the new architecture and must be validated against the business owner's intended accounting rules before production.
 
+Task 57 owner decision OD-18 (2026-10-02) now confirms preserving this existing accounting policy: profitability includes only Active expenses. Expense Summary separately includes all non-Deleted expenses. These report populations intentionally differ; no further accounting-policy change is authorized by Task 57.
+
 ## Deferred
 - Profitability UI: Task 45
 - API endpoints: Task 44

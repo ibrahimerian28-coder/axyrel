@@ -256,11 +256,12 @@ Dependencies/Carry-forward: OD-17 Option A implemented; see docs/task56_final_ch
 
 ## Task 57 — Expenses → Profitability Integration
 
-Status: NEXT
+Status: DONE / ACCEPTED
+Dependencies/Carry-forward: OD-18 confirms Active-only Profitability expenses and separate non-Deleted Expense Summary semantics. Existing derived integration verified; see docs/task57_final_checkpoint.md. Verify commit/push before continuing. No production accounting-policy or schema changes.
 
 ## Task 58 — Notifications / Audit Integration
 
-Status: PENDING
+Status: NEXT
 
 ## Task 59 — Create Production Database
 
