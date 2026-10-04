@@ -39,6 +39,6 @@ with tempfile.TemporaryDirectory(prefix="axyrel-phase2-") as folder:
     from backend.main import app
     import uvicorn
     try:
-        uvicorn.run(app, host="127.0.0.1", port=8110, log_level="warning", access_log=False)
+        uvicorn.run(app, host="127.0.0.1", port=int(os.environ.get("AXYREL_PHASE2_TEST_PORT", "8110")), log_level="warning", access_log=False)
     finally:
         engine.dispose()

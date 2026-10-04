@@ -1,1 +1,1 @@
-export const text = { product: "Axyrel", tagline: "Work Smarter. Serve Better.", signIn: "Sign in", signOut: "Sign out", phase: "Frontend v1", ready: "Your workspace is ready", description: "Dashboard, Customers and Assets are available. Other domains remain for later approved phases." };
+export const text = { product: "Axyrel", tagline: "Work Smarter. Serve Better.", signIn: "Sign in", signOut: "Sign out", ready: "Your workspace is ready", description: "Dashboard, Customers and Assets are available. Other domains remain for later approved phases." };
