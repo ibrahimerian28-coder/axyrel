@@ -13,3 +13,4 @@ pydantic-settings
 PyJWT>=2.9,<3.0
 
 python-multipart>=0.0.20,<1.0
+Pillow>=12.3.0,<13.0

@@ -21,6 +21,7 @@ with tempfile.TemporaryDirectory(prefix="axyrel-phase2-") as folder:
     from backend.models.customer import Customer
     from backend.models.asset import Asset
     from backend.models.work_order import WorkOrder
+    from backend.models.service_visit import ServiceVisit
     from backend.models.service_history import ServiceHistory
     from datetime import datetime
     Base.metadata.create_all(engine)
@@ -33,7 +34,9 @@ with tempfile.TemporaryDirectory(prefix="axyrel-phase2-") as folder:
         db.add(customer); db.flush()
         asset = Asset(id=uuid4(), company_id=company.id, customer_id=customer.id, display_id=2001, asset_type="HVAC", model="Synthetic Model", serial_number="SYN-001", status="Active")
         db.add(asset); db.flush()
-        db.add(WorkOrder(id=uuid4(), company_id=company.id, customer_id=customer.id, asset_id=asset.id, title="Synthetic inspection", status="Open"))
+        order = WorkOrder(id=uuid4(), company_id=company.id, customer_id=customer.id, asset_id=asset.id, title="Synthetic inspection", status="Open")
+        db.add(order); db.flush()
+        db.add(ServiceVisit(id=uuid4(), company_id=company.id, customer_id=customer.id, asset_id=asset.id, work_order_id=order.id, status="Planned"))
         db.add(ServiceHistory(id=uuid4(), company_id=company.id, customer_id=customer.id, asset_id=asset.id, service_type="Inspection", summary="Synthetic completed inspection", service_date=datetime(2026, 1, 15), status="Active"))
         db.commit()
     from backend.main import app

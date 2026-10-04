@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     # Deprecated compatibility setting. Task 46 derives tenant context from the authenticated user.
     company_id: str = Field(default="", alias="AXYREL_COMPANY_ID")
     api_timeout_seconds: int = Field(default=20, alias="AXYREL_API_TIMEOUT_SECONDS", ge=1)
+    private_image_root: str = Field(default=".private-images", alias="AXYREL_PRIVATE_IMAGE_ROOT")
 
     model_config = SettingsConfigDict(
         env_file=".env",
