@@ -1,6 +1,6 @@
 # Axyrel Frontend v1 — Local Review
 
-Owner-approved separate frontend phase; not Task 91. Historical Tasks 1–90 and Streamlit remain unchanged. Phase 1 provides login/session handling, typed API forwarding, React Query and shared states. Phase 2 adds Dashboard, Customers and Assets, linked profiles, supported create/edit forms and explicit phone actions. Other domains remain labelled later-phase placeholders, including destinations reached from related-record context. No later domain implementation or production deployment.
+The approved MVP frontend is implemented through Phase 3 and the remaining operations modules. FastAPI/PostgreSQL remains authoritative. Streamlit remains unchanged. For persistent local owner review, use [OWNER_REVIEW.md](OWNER_REVIEW.md); the disposable Phase 2 harness below is retained for regression testing. See [MVP_COMPLETION_REPORT.md](MVP_COMPLETION_REPORT.md) for final scope and validation.
 
 ## Owner visual review with synthetic data only
 
@@ -49,7 +49,7 @@ Set server-only `AXYREL_PRIVATE_IMAGE_ROOT` to a private directory outside any w
 
 Storage is abstracted through ImageStorage.read/replace/remove. A future private S3-compatible adapter can be selected in the factory without changing Customer/Asset business logic or API/UI. It must preserve atomic single-key replacement, bounded reads and deletion. Keys are derived from server-authenticated company, resource and existing UUID; no image schema migration is needed. Only processed pixels are retained. Soft-deleted records become inaccessible through the existing record lookup; their stored image is retained alongside the soft-deleted record until an explicitly reviewed retention/purge policy. Explicit Remove image deletes the object.
 
-Asset CSV import is approved future Frontend v1 scope, requiring the validated CSV preview/validation/atomic commit workflow in PHASE2_OWNER_REMEDIATION.md. It is not implemented and no Import button is displayed. Phase 3 Service Flow is available; Asset Import remains deferred.
+Asset CSV import is implemented with authenticated tenant-local preview, structured errors, explicit confirmation, transactional revalidation and idempotent retry. It creates Assets only; existing records are never updated. See MVP_COMPLETION_REPORT.md for limits and normalization.
 
 
 ## Phase 3 Service Flow
@@ -59,3 +59,8 @@ Requests, Work Orders, Schedule, Service Visits and Service History now use the 
 Validation from the repository root: `.\.venv\Scripts\python.exe -B tests/run_phase3_backend_validation.py`. From frontend: `npm.cmd run test:phase3`. The latter serves real FastAPI on 8130 and production Next on 3130 using a generated local PostgreSQL database named `axyrel_phase3_test_<random hex>`. It reads local PostgreSQL connection configuration only to create/drop that disposable database through the postgres administration database; it never connects to the configured application database. It refuses remote hosts and stale fixture markers. Run browser suites sequentially to avoid short sign-in assertion timeouts under CPU load.
 
 After a Windows Playwright shutdown, run `.\.venv\Scripts\python.exe -B frontend/tests/phase3-api.py --cleanup` from the repository root. Cleanup accepts only the generated database name stored in the git-ignored test marker and refuses other targets. No application migrations or production/deployment operations occur. See PHASE3_IMPLEMENTATION_REPORT.md for scope, API limitations and validation evidence.
+
+
+## Remaining MVP operations
+
+Inventory items, existing record-only transactions, Technician Stock, Invoices, Expenses, backend Profitability and real-data Reports are available. No warehouse transfer API or fabricated historical metrics were added. Run `npm.cmd run test:mvp` from frontend. From the repository root, run `.\.venv\Scripts\python.exe -B tests/test_asset_csv_import.py` and `.\.venv\Scripts\python.exe -B tests/run_mvp_backend_regressions.py`. Use isolated disposable PostgreSQL fixtures for these suites; never point them at owner-review or production data.
