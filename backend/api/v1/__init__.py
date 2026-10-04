@@ -1,5 +1,6 @@
 """Task 46 API v1 router registry."""
 from fastapi import APIRouter
+from backend.api.v1.asset_import import router as asset_import_router
 from backend.api.v1.profile_images import router as profile_images_router
 
 from backend.api.v1.assets import router as assets_router
@@ -23,6 +24,7 @@ from backend.api.v1.work_orders import router as work_orders_router
 
 router = APIRouter()
 for _router in (
+    asset_import_router,
     profile_images_router,
     auth_router,
     customers_router,

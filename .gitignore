@@ -6,3 +6,6 @@ __pycache__/
 .pytest_cache/
 .coverage
 .private-images/
+
+# Persistent local owner review secrets, credentials, logs and private images
+.owner-review/

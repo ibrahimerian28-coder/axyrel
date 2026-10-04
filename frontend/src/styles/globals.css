@@ -126,3 +126,13 @@ textarea { font: inherit; color: var(--ink); min-height: 80px; width: 100%; max-
 @media (max-width: 600px) { .calendar-toolbar { align-items: start; flex-direction: column; } .calendar-toolbar .actions { gap: 6px; } .service-filters label { min-width: 120px; } .service-detail .profile-header { flex-direction: column; } }
 
 @media (max-width: 600px) { .service-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .service-filters label { min-width: 0; } .service-filters label:nth-of-type(3) { grid-column: 1 / -1; } }
+
+.import-panel { margin-block-end: 22px; }
+.import-panel label { display: block; margin-block: 14px; }
+.check-label { display: flex !important; align-items: center; gap: 10px; }
+.check-label input { width: auto; }
+.financial-report { margin-block: 22px; }
+.financial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
+.financial-grid div { background: #f4f8fc; padding: 16px; border-radius: 10px; }
+.financial-grid dd { margin: 8px 0 0; font-weight: 700; font-size: 1.2rem; }
+.report-bar { background: var(--teal); height: 14px; min-width: 1px; border-radius: 4px; }

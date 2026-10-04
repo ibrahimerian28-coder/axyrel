@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from backend.core.tenant_isolation import require_company_id
 from backend.models.asset import Asset
+from backend.core.asset_lock import lock_assets
 from backend.repositories.base import TenantScopedRepository
 
 
@@ -66,6 +67,7 @@ class AssetRepository(TenantScopedRepository):
         data: dict,
     ) -> Asset:
         company_id = require_company_id(company_id)
+        lock_assets(db, company_id)
         display_id = data.pop("display_id", None)
         if display_id is None:
             max_id = db.scalar(select(func.max(Asset.display_id)).where(Asset.company_id == company_id)) or 0
@@ -82,6 +84,7 @@ class AssetRepository(TenantScopedRepository):
         asset_id: UUID,
         data: dict,
     ) -> Asset | None:
+        lock_assets(db, self._require_company_scope(company_id))
         asset = self.get(db, company_id, asset_id)
         if asset is None:
             return None
@@ -98,6 +101,7 @@ class AssetRepository(TenantScopedRepository):
         asset_id: UUID,
     ) -> Asset | None:
         company_id = self._require_company_scope(company_id)
+        lock_assets(db, company_id)
         asset = db.scalar(
             select(Asset).where(
                 Asset.id == asset_id,
