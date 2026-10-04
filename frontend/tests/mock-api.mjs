@@ -16,5 +16,6 @@ http.createServer(async (req, res) => {
     return res.end(JSON.stringify({ id: role === "admin" ? "11111111-1111-4111-8111-111111111111" : "22222222-2222-4222-8222-222222222222", company_id: "33333333-3333-4333-8333-333333333333", email: `${role}@example.test`, full_name: role === "admin" ? "Synthetic Admin" : "Synthetic Technician", role, is_active: true, permissions: permissions[role] }));
   }
   if (req.url === "/api/v1/customers") { res.statusCode = 403; return res.end('{"detail":"Insufficient permissions"}'); }
+  if (req.method === "GET" && ["assets", "work-orders", "service-requests", "service-visits", "service-history", "invoices", "schedules", "inventory", "technician-directory"].some(resource => req.url === `/api/v1/${resource}`)) return res.end("[]");
   res.statusCode = 404; res.end('{"detail":"Not found"}');
 }).listen(8109, "127.0.0.1");

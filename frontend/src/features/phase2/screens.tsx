@@ -9,11 +9,11 @@ import { api, ApiError } from "@/lib/api/client";
 import type { User, Technician } from "@/lib/api/types";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
 
-type Row = { id: string; display_id?: number | null; [key: string]: string | number | null | undefined };
+export type Row = { id: string; display_id?: number | null; [key: string]: string | number | null | undefined };
 type Navigate = (module: string, id?: string) => void;
 const resources = ["customers", "assets", "work-orders", "service-requests", "service-visits", "service-history", "invoices", "schedules", "inventory"] as const;
 const permission = (resource: string) => resource === "customers" ? "customer:read" : resource === "assets" ? "asset:read" : resource === "invoices" ? "billing:read" : resource === "inventory" ? "inventory:read" : "service:read";
-function useRecords(user: User) {
+export function useRecords(user: User) {
   return useQuery({ queryKey: ["phase2", user.id, user.company_id], queryFn: async () => {
     const entries = await Promise.all(resources.map(async resource => [resource, user.permissions.includes(permission(resource)) ? await api<Row[]>(resource) : []] as const));
     const technicians = user.permissions.includes("service:read") ? await api<Technician[]>("technician-directory") : [];

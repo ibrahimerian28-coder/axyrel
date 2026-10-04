@@ -11,7 +11,8 @@ test("login, role navigation, unchanged logo and logout session cleanup", async 
   expect(await page.evaluate(() => localStorage.length)).toBe(0);
   const image = page.locator(".brand-image"); await expect(image).toHaveAttribute("src", "/brand/axyrel-logo.png");
   expect(await image.evaluate((img: HTMLImageElement) => img.naturalWidth > 0 && Math.abs(img.width / img.height - img.naturalWidth / img.naturalHeight) < 0.02)).toBe(true);
-  await page.getByRole("button", { name: "Schedule", exact: true }).click(); await expect(page.getByRole("heading", { name: "Schedule is planned for a later phase" })).toBeVisible();
+  await page.route("**/api/backend/customers", route => route.fulfill({ json: [] }));
+  await page.getByRole("button", { name: "Schedule", exact: true }).click(); await expect(page.getByRole("heading", { name: "Schedule", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Sign out" }).click(); await expect(page).toHaveURL(/\/login$/); expect((await context.cookies()).some(c => c.name === "axyrel_session")).toBe(false);
   await login(page, "technician"); await expect(page.getByText("Synthetic Technician", { exact: true })).toBeVisible(); await expect(page.getByRole("button", { name: "Invoices", exact: true })).toHaveCount(0);
 });
@@ -23,6 +24,7 @@ test("incorrect credentials, unauthenticated request and origin protection", asy
   await page.goto("/workspace"); await expect(page.getByRole("heading", { name: "Sign in to continue" })).toBeVisible();
 });
 test("mobile navigation, RTL logical layout and keyboard entry", async ({ page }) => {
+  await page.route("**/api/backend/customers", route => route.fulfill({ json: [] }));
   await page.setViewportSize({ width: 390, height: 844 }); await page.goto("/login"); await page.keyboard.press("Tab"); await expect(page.getByLabel("Email", { exact: true })).toBeFocused(); await login(page, "technician");
   await page.getByRole("button", { name: "Toggle navigation" }).click(); await expect(page.getByRole("button", { name: "Schedule", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Schedule", exact: true }).click(); await expect(page.getByRole("heading", { name: "Schedule", exact: true })).toBeVisible();

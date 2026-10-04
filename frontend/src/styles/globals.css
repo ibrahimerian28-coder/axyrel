@@ -96,3 +96,33 @@ h1, h2, h3 { font-weight: 700; } h3 { margin-block: 0 12px; } .records-count { d
 .image-picker { font-size: .85rem; }
 .image-picker input { display: block; max-width: 100%; font-size: .8rem; padding: 8px 0; }
 .profile-image-section > p, .profile-image-section > [role=status] { flex-basis: 100%; margin: 0; font-size: .85rem; }
+
+fieldset { border: 0; padding: 0; min-width: 0; }
+textarea { font: inherit; color: var(--ink); min-height: 80px; width: 100%; max-width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+.service-filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; margin-block-end: 20px; }
+.service-filters label { flex: 1; min-width: 140px; font-size: .85rem; }
+.service-detail h2 { overflow-wrap: anywhere; }
+.service-related { margin-block-start: 22px; border-block-start: 1px solid var(--border); padding-block-start: 16px; }
+.service-related form { display: grid; gap: 12px; }
+.event-input { display: grid; gap: 8px; }
+.delete-confirm { background: #fff3e7; border: 1px solid #e8caa8; border-radius: 10px; padding: 14px; margin-block: 16px; }
+.delete-confirm button { margin-inline-end: 8px; }
+.calendar-panel { margin-block-end: 22px; }
+.calendar-toolbar { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+.calendar-toolbar h2 { margin: 0; }
+.calendar-toolbar label { font-size: .85rem; }
+.calendar-view-controls { display: flex; gap: 8px; }
+.calendar-view-controls [aria-pressed=true] { background: var(--teal); color: white; border-color: var(--teal); }
+.week-view { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.calendar-day { background: #f4f8fc; border: 1px solid var(--border); border-radius: 10px; padding: 10px; min-height: 200px; min-width: 0; }
+.calendar-day h3 { font-size: .85rem; }
+.calendar-day p { font-size: .8rem; }
+.schedule-card { display: grid; gap: 8px; width: 100%; text-align: start; padding: 10px; margin-block: 8px; border-inline-start: 3px solid var(--teal); white-space: normal; overflow-wrap: anywhere; font-size: .8rem; }
+.schedule-card .badge { justify-self: start; }
+.agenda-view { display: none; }
+.calendar-panel[data-view=agenda] .week-view { display: none; }
+.calendar-panel[data-view=agenda] .agenda-view { display: block; }
+@media (max-width: 1000px) { .week-view { display: none; } .agenda-view { display: block; } .calendar-view-controls { display: none; } }
+@media (max-width: 600px) { .calendar-toolbar { align-items: start; flex-direction: column; } .calendar-toolbar .actions { gap: 6px; } .service-filters label { min-width: 120px; } .service-detail .profile-header { flex-direction: column; } }
+
+@media (max-width: 600px) { .service-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .service-filters label { min-width: 0; } .service-filters label:nth-of-type(3) { grid-column: 1 / -1; } }
