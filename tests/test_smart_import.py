@@ -210,4 +210,100 @@ class SmartImportTests(unittest.TestCase):
         with self.assertRaises(ValueError): validate(None,None,self.data())
         with self.assertRaises(ValueError): commit(None,None,uuid4(),self.data(),'token',str(uuid4()))
 
+    def records(self, resource):
+        return self.client.get('/api/v1/'+resource,headers=self.headers['admin']).json()
+
+    def test_20_skip_collision_restore_mixed_commit_and_retry(self):
+        from copy import deepcopy
+        original_customers=self.records('customers');original_assets=self.records('assets')
+        data=self.data(phone='+201000000001',serial='SYN-001')
+        data['rows'].append(self.data(phone='01099998888',name='New Import Customer',serial='SMART-TEST-002')['rows'][0])
+        initial=self.preview(data).json()
+        self.assertFalse(initial['valid']);self.assertEqual(initial['preview'][0]['category'],'Needs attention')
+        data['skipped_rows']=[2];review=self.preview(data).json()
+        self.assertTrue(review['valid']);self.assertEqual(review['preview'][0]['category'],'Skipped')
+        self.assertEqual(review['summary'],dict(new_customers=1,existing_customers=0,new_assets=1,overwritten_assets=0,attention_rows=0,skipped_rows=1))
+        restored=deepcopy(data);restored['skipped_rows']=[]
+        self.assertFalse(self.preview(restored).json()['valid'])
+        self.assertEqual(self.commit(restored,review).status_code,400)
+        key=str(uuid4());result=self.commit(data,review,key).json();again=self.commit(data,review,key).json()
+        self.assertTrue(again['replayed']);self.assertEqual(result['asset_numbers'],again['asset_numbers'])
+        customers=self.records('customers');assets=self.records('assets')
+        for before in original_customers:self.assertEqual(before,next(c for c in customers if c['id']==before['id']))
+        for before in original_assets:self.assertEqual(before,next(a for a in assets if a['id']==before['id']))
+        created=[c for c in customers if c['name']=='New Import Customer'];self.assertEqual(len(created),1)
+        created_assets=[a for a in assets if a['serial_number']=='SMART-TEST-002'];self.assertEqual(len(created_assets),1)
+        self.assertEqual(created_assets[0]['customer_id'],created[0]['id'])
+
+    def test_21_skip_recomputes_groups_and_conflicts(self):
+        data=self.data(phone='01000000031');data['rows'].append([*data['rows'][0]])
+        data['rows'][1][0]='Conflicting name';data['rows'][1][3]=uuid4().hex
+        self.assertFalse(self.preview(data).json()['valid'])
+        data['skipped_rows']=[2];review=self.preview(data).json()
+        self.assertTrue(review['valid']);self.assertEqual(review['summary']['new_customers'],1)
+        result=self.commit(data,review).json();self.assertEqual(len(result['customer_numbers']),1);self.assertEqual(len(result['asset_numbers']),1)
+        self.assertFalse(any(a['serial_number']==data['rows'][0][3] for a in self.records('assets')))
+
+    def test_22_all_skipped_has_no_token_or_receipt_even_direct_commit(self):
+        from sqlalchemy import select,func
+        from backend.core.database import SessionLocal
+        from backend.core.config import get_settings
+        from backend.models.audit_log import AuditLog
+        from backend.models.user import User
+        from backend.services.smart_import import preview_token
+        data=self.data(phone='01000000032');data['rows'].append([*data['rows'][0]]);data['skipped_rows']=[2,3]
+        before=(self.records('customers'),self.records('assets'))
+        with SessionLocal() as db:
+            user=db.scalar(select(User).where(User.email=='admin@example.test'))
+            token=preview_token(data,user.company_id,user.id,[])
+            receipts=db.scalar(select(func.count()).select_from(AuditLog))
+        review=self.preview(data).json();self.assertFalse(review['valid']);self.assertNotIn('token',review)
+        self.assertEqual(review['message'],'No rows selected for import.');self.assertEqual(review['summary']['new_customers'],0)
+        self.assertFalse(self.commit(data,{'token':token}).json()['valid'])
+        self.assertEqual(before,(self.records('customers'),self.records('assets')))
+        with SessionLocal() as db:self.assertEqual(receipts,db.scalar(select(func.count()).select_from(AuditLog)))
+
+    def test_23_skip_ready_customers_and_assets_modes(self):
+        for mode,phone in [('customers','01000000033'),('assets','+201000000001')]:
+            data=self.data(mode,phone=phone);data['rows'].append([*data['rows'][0]])
+            data['rows'][1][1]='01000000034' if mode=='customers' else phone;data['rows'][1][3]=uuid4().hex
+            data['skipped_rows']=[2];review=self.preview(data).json();self.assertTrue(review['valid'],review)
+            result=self.commit(data,review).json();self.assertEqual(result['summary']['skipped_rows'],1)
+            self.assertEqual(len(result['customer_numbers']),1 if mode=='customers' else 0)
+            self.assertEqual(len(result['asset_numbers']),1 if mode=='assets' else 0)
+            if mode=='customers':self.assertFalse(any(c['phones'] and any(p['number']==phone for p in c['phones']) for c in self.records('customers')))
+            else:self.assertFalse(any(a['serial_number']==data['rows'][0][3] for a in self.records('assets')))
+
+    def test_24_skip_business_errors_and_duplicate_file_are_excluded(self):
+        data=self.data(phone='01000000035');data['rows'].append([*data['rows'][0]])
+        data['rows'][0][1]='invalid';data['rows'][0][4]='Atlantis';data['rows'][0][5]='Cairoo';data['rows'][0][6]='bad date'
+        self.assertFalse(self.preview(data).json()['valid'])
+        data['skipped_rows']=[2];review=self.preview(data).json();self.assertTrue(review['valid'],review);self.assertEqual(review['errors'],[])
+        self.assertTrue(self.commit(data,review).json()['valid'])
+
+    def test_25_skip_state_and_source_identity_tampering(self):
+        from copy import deepcopy
+        data=self.data(phone='+201000000001');data['rows'].append([*data['rows'][0]]);data['rows'][1][3]=uuid4().hex
+        data['skipped_rows']=[2];review=self.preview(data).json()
+        for skip in [[],[3]]:
+            changed=deepcopy(data);changed['skipped_rows']=skip;self.assertEqual(self.commit(changed,review).status_code,400)
+        changed=deepcopy(data);changed['rows'].reverse();self.assertEqual(self.commit(changed,review).status_code,400)
+        changed=deepcopy(data);changed['corrections']={'2':{'phone':'01000000036'}};self.assertEqual(self.commit(changed,review).status_code,400)
+
+    def test_26_skip_request_bounds_and_types(self):
+        for skipped in ['2',{},None,[True],['2'],[2.0],[1],[3],[2,2]]:
+            data=self.data();data['skipped_rows']=skipped
+            with self.subTest(skipped=skipped):self.assertEqual(self.preview(data).status_code,400)
+        data=self.data();data['skipped_rows']=[2];data['rows'][0][0]='x'*1001
+        self.assertEqual(self.preview(data).status_code,400)
+
+    def test_27_skipped_foreign_phone_and_selection_expose_nothing(self):
+        foreign=self.customer('Skip foreign secret','01000000037','foreign')
+        data=self.data(phone='01000000037');data['rows'].append(self.data(phone='+201000000001')['rows'][0])
+        data['corrections']={'2':{'customer_selection':str(foreign['display_id'])}};data['skipped_rows']=[2]
+        review=self.preview(data).json();self.assertTrue(review['valid']);self.assertIsNone(review['preview'][0]['customer_number'])
+        self.assertNotIn(foreign['name'],json.dumps(review));self.assertNotIn(foreign['id'],json.dumps(review))
+        self.assertEqual(self.commit(data,review,role='foreign').status_code,400)
+        self.assertTrue(self.commit(data,review).json()['valid'])
+
 if __name__=='__main__': unittest.main(verbosity=2)

@@ -154,3 +154,5 @@ textarea { font: inherit; color: var(--ink); min-height: 80px; width: 100%; max-
 .editor fieldset {border:0;padding:0;min-inline-size:0}.phone-editor fieldset {border:1px solid var(--border);padding:12px;margin-block:12px;border-radius:8px}.editor output,.editor small {display:block;margin-block:8px}.phone-editor .form-grid {grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
 
 .editor .form-grid > label {min-inline-size:0}.editor select {inline-size:100%;min-inline-size:0}.editor input {min-inline-size:0;max-inline-size:100%}.editor legend {max-inline-size:100%}.editor {min-inline-size:0}
+
+.smart-import .smart-row.is-skipped { border-style: dashed; background: var(--canvas); }

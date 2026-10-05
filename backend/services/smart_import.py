@@ -73,6 +73,10 @@ def request_rows(data):
     if not required.issubset(selected): raise ValueError('Map Customer Name and Phone for Customers, and Asset Type for Assets.')
     if mode == 'combined' and 'asset_type' not in selected: raise ValueError('Map Asset Type for Customers + Assets.')
     if not isinstance(rows, list) or not 1 <= len(rows) <= MAX_ROWS: raise ValueError('Use 1–1000 data rows.')
+    # Source ordinals refer to the unchanged uploaded rows, never preview order.
+    skipped = data.get('skipped_rows', [])
+    if not isinstance(skipped, list) or len(skipped) > MAX_ROWS or any(type(number) is not int or not 2 <= number <= len(rows) + 1 for number in skipped) or len(set(skipped)) != len(skipped):
+        raise ValueError('Choose unique source row numbers from this upload to skip.')
     corrections = data.get('corrections', {})
     if not isinstance(corrections, dict) or len(corrections) > MAX_ROWS: raise ValueError('Invalid row corrections.')
     result = []
@@ -103,6 +107,7 @@ def customer_index(customers):
 def validate(db, company_id, data):
     company_id = require_company_id(company_id)
     mode, records = request_rows(data)
+    skipped = set(data.get('skipped_rows', []))
     customers = list(db.scalars(select(Customer).where(Customer.company_id == company_id, Customer.status != 'Deleted')))
     phones = customer_index(customers)
     existing_serials = {serial_key(s) for s in db.scalars(select(Asset.serial_number).where(Asset.company_id == company_id)) if serial_key(s)} if mode != 'customers' else set()
@@ -111,6 +116,9 @@ def validate(db, company_id, data):
         errors.append({'row': row, 'field': field, 'label': FIELDS.get(field, ('Customer',))[0], 'message': message, 'code': code})
     for number, original in enumerate(records, 2):
         row = {key: value.strip() for key, value in original.items()}
+        if number in skipped:
+            preview.append({'row': number, 'customer': row.get('customer_name', ''), 'customer_number': None, 'match': 'Skipped. No records will be created.', 'category': 'Skipped', 'phone': row.get('phone', ''), 'asset_type': row.get('asset_type', ''), 'serial_number': original.get('serial_number', ''), 'warranty_end': '', 'values': original})
+            continue
         before = len(errors)
         country, state, phone_country, normalized, matched = None, None, None, None, None
         try: country = resolve_country(row.get('country') or 'Egypt')
@@ -193,8 +201,8 @@ def validate(db, company_id, data):
     bad_rows = {e['row'] for e in errors}
     for item in preview:
         if item['row'] in bad_rows: item['category'] = 'Needs attention'
-    summary = {'new_customers': len({p['group'] for p in plan if not p['existing']}) if mode != 'assets' else 0, 'existing_customers': len({p['existing'] for p in plan if p['existing']}), 'new_assets': len(plan) if mode != 'customers' else 0, 'overwritten_assets': 0, 'attention_rows': len(bad_rows)}
-    return {'valid': not errors, 'rows': len(records), 'preview': preview, 'errors': errors, 'summary': summary}, plan
+    summary = {'new_customers': len({p['group'] for p in plan if not p['existing']}) if mode != 'assets' else 0, 'existing_customers': len({p['existing'] for p in plan if p['existing']}), 'new_assets': len(plan) if mode != 'customers' else 0, 'overwritten_assets': 0, 'attention_rows': len(bad_rows), 'skipped_rows': len(skipped)}
+    return {'valid': not errors and bool(plan), 'message': '' if plan else 'No rows selected for import.', 'rows': len(records), 'preview': preview, 'errors': errors, 'summary': summary}, plan
 
 
 def preview_token(data, company_id, user_id, plan):
