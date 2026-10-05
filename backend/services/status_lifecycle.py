@@ -50,19 +50,15 @@ def ensure_service_visit_transition(current: str, target: str) -> str:
     return target
 
 
-def derive_work_order_status(visit_statuses: list[str]) -> str | None:
-    """Derive a work-order status from related visits. None means leave unchanged."""
+def derive_work_order_status(visit_statuses: list[str], *, remaining_schedules: bool = False) -> str | None:
+    """Execution affects activity, never whole-job terminal decisions."""
     active = [status for status in visit_statuses if status not in TERMINAL_FILTER]
     if not active:
         return None
     if any(status == "In Progress" for status in active):
         return "In Progress"
-    if any(status == "Planned" for status in active):
+    if remaining_schedules or any(status == "Planned" for status in active):
         return "Open"
-    if all(status == "Cancelled" for status in active):
-        return "Cancelled"
-    if all(status in {"Completed", "Cancelled"} for status in active) and any(
-        status == "Completed" for status in active
-    ):
-        return "Completed"
+    if active:
+        return "Open"
     return None

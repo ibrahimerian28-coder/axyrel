@@ -17,6 +17,9 @@ from backend.models.user import User
 import backend.models  # register accepted relationships
 
 
+MIGRATION_COUNT = len(list((fixture.ROOT / "migrations").glob("[0-9][0-9][0-9]_*.sql")))
+
+
 SERVER = '''
 import socket, sys, threading
 from pathlib import Path
@@ -105,9 +108,9 @@ class Task86DeploymentRehearsal(unittest.TestCase):
         self.fail('Local synthetic server did not become healthy within 20 seconds')
 
     def test_reproducible_migrations_startup_database_requests_ui_and_shutdown(self):
-        self.assertEqual(self._migrate().count('  OK:'), 13)
+        self.assertEqual(self._migrate().count('  OK:'), MIGRATION_COUNT)
         before = self._rows()
-        self.assertEqual(self._migrate().count('SKIP:'), 13)
+        self.assertEqual(self._migrate().count('SKIP:'), MIGRATION_COUNT)
         self.assertEqual(self._rows(), before)
         company, identity = uuid4(), uuid4()
         with Session(self.engine) as db, db.begin():

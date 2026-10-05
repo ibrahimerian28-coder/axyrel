@@ -47,7 +47,7 @@ function ServiceChart({ orders, visits }: { orders: Row[]; visits: Row[] }) {
 const customerFields: [string, string, string?][] = [["name", "Name", "required"]];
 const assetFields: [string, string, string?][] = [["asset_type", "Asset type", "required"], ["manufacturer", "Manufacturer"], ["model", "Model"], ["serial_number", "Serial number"], ["notes", "Notes"]];
 function contactPhones(customer?: Row):Phone[] { return (customer as unknown as {phones?:Phone[]|null})?.phones ?? ["phone","phone_1","phone_2","phone_3","phone_4"].filter(k=>customer?.[k]).map(k=>({country:null,number:String(customer?.[k]),label:k==="phone"?"Primary":k,normalized:/^\+[1-9]\d{7,14}$/.test(String(customer?.[k]))?String(customer?.[k]):null})); }
-function Editor({ kind, row, customers, initialCustomer, done, close }: { kind: "Customers" | "Assets"; row?: Row; customers: Row[]; initialCustomer?: string; done: (id: string) => void; close: () => void }) {
+export function Editor({ kind, row, customers, initialCustomer, done, close }: { kind: "Customers" | "Assets"; row?: Row; customers: Row[]; initialCustomer?: string; done: (id: string) => void; close: () => void }) {
   const [phones,setPhones]=useState<Phone[]>(()=>{const existing=row?contactPhones(row):[];return existing.length?existing:[{country:"EG",number:"",label:"Primary"}];}); const [error, setError] = useState(""); const [pending, setPending] = useState(false); const fields = kind === "Customers" ? customerFields : assetFields;
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); setPending(true); setError(""); const form = new FormData(event.currentTarget); const payload: Record<string, unknown> = {};

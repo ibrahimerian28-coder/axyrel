@@ -6,6 +6,8 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from backend.core.event_time import normalize_event_time
+from backend.core.service_lock import lock_service
+from backend.repositories.service_visit import ServiceVisitRepository
 from backend.repositories.schedule import ScheduleRepository
 from backend.repositories.work_order import WorkOrderRepository
 
@@ -57,15 +59,23 @@ class ScheduleService:
         return self.repository.get(db, company_id, schedule_id)
 
     def create_schedule(self, db: Session, company_id: UUID | None, data: dict):
+        lock_service(db, company_id)
         data = self._normalized_data(data)
         self._validate_work_order(db, company_id, data.get("work_order_id"))
+        order = self.work_order_repository.get(db, company_id, data.get("work_order_id"))
+        if order and order.status in {"Completed", "Cancelled"}:
+            raise ValueError("Cannot schedule a terminal work order")
         self._validate_range(data.get("start_at"), data.get("end_at"))
         return self.repository.create(db, company_id, data)
 
     def update_schedule(self, db: Session, company_id: UUID | None, schedule_id: UUID, data: dict):
+        lock_service(db, company_id)
         record = self.repository.get(db, company_id, schedule_id)
         if record is None:
             return None
+        visits = ServiceVisitRepository().list(db, company_id, schedule_id=schedule_id)
+        if visits and any(key in data and data[key] != getattr(record, key) for key in ("work_order_id", "start_at", "end_at", "technician_id", "status")):
+            raise ValueError("An executed appointment cannot be rescheduled; use a follow-up appointment or cancel its visit")
         data = self._normalized_data(data)
         if "work_order_id" in data:
             self._validate_work_order(db, company_id, data["work_order_id"])
@@ -73,4 +83,7 @@ class ScheduleService:
         return self.repository.update(db, company_id, schedule_id, data)
 
     def delete_schedule(self, db: Session, company_id: UUID | None, schedule_id: UUID):
+        lock_service(db, company_id)
+        if ServiceVisitRepository().list(db, company_id, schedule_id=schedule_id):
+            raise ValueError("An executed appointment must be retained; cancel its visit instead")
         return self.repository.soft_delete(db, company_id, schedule_id)

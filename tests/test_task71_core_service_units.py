@@ -32,11 +32,12 @@ class Task71CoreServiceUnits(unittest.TestCase):
 
     def test_work_order_aggregation_priority_and_deleted_filter(self):
         cases = [([], None), (['Deleted'], None), (['Completed', 'In Progress'], 'In Progress'),
-                 (['Planned', 'Completed'], 'Open'), (['Cancelled'], 'Cancelled'),
-                 (['Cancelled', 'Completed', 'Deleted'], 'Completed')]
+                 (['Planned', 'Completed'], 'Open'), (['Cancelled'], 'Open'),
+                 (['Cancelled', 'Completed', 'Deleted'], 'Open')]
         for statuses, expected in cases:
             with self.subTest(statuses=statuses):
                 self.assertEqual(derive_work_order_status(statuses), expected)
+        self.assertEqual(derive_work_order_status(["Completed"], remaining_schedules=True), "Open")
 
     def test_asset_missing_customer_prevents_repository_mutation(self):
         repository, customers = Mock(), Mock()
@@ -58,6 +59,7 @@ class Task71CoreServiceUnits(unittest.TestCase):
 
     def test_asset_patch_without_customer_keeps_explicit_payload(self):
         repository, customers = Mock(), Mock()
+        repository.get.return_value = SimpleNamespace(country='EG', state=None, warranty_years=None, installation_date=None)
         service = AssetService(repository, customers)
         db, company, identifier, payload = object(), uuid4(), uuid4(), {'notes': 'Synthetic'}
         service.update_asset(db, company, identifier, payload)
@@ -105,7 +107,8 @@ class Task71CoreServiceUnits(unittest.TestCase):
             (InventoryService, 'create_item', 'update_item', 'item_name', 'Item name is required.')]:
             with self.subTest(service=service_type.__name__):
                 repository = Mock()
-                service, db, company = service_type(repository), object(), uuid4()
+                service, db, company = service_type(repository), Mock(), uuid4()
+                db.get_bind.return_value = SimpleNamespace(dialect=SimpleNamespace(name="sqlite"))
                 payload = {key: '  Synthetic  '}
                 getattr(service, create)(db, company, payload)
                 self.assertEqual(payload[key], '  Synthetic  ')

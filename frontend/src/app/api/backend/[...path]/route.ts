@@ -3,6 +3,8 @@ import { backendUrl, token, sameOrigin, cookieOptions, SESSION_COOKIE } from "@/
 const resources = new Set(["customers", "assets", "service-requests", "work-orders", "schedules", "service-visits", "service-history", "inventory", "technician-stock", "inventory-transactions", "invoices", "service-contracts", "expenses", "profitability", "notifications", "audit-logs", "technician-directory"]);
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function allowed(parts: string[], method: string) {
+  if (parts[0] === "service-desk") return parts.length === 1 ? method === "GET" : parts.length === 2 ? parts[1] === "quick" && method === "POST" : parts.length === 4 && method === "POST" && uuid.test(parts[2]) && ((["requests", "jobs"].includes(parts[1]) && parts[3] === "schedule") || (parts[1] === "jobs" && ["cancel", "correct-lifecycle"].includes(parts[3])) || (parts[1] === "schedules" && ["start", "cancel", "reschedule"].includes(parts[3])) || (parts[1] === "visits" && parts[3] === "outcome"));
+  if (parts.length === 4 && parts[0] === "service-visits" && uuid.test(parts[1]) && parts[2] === "parts" && parts[3] === "reverse") return method === "POST";
   if (parts.join("/") === "auth/me") return method === "GET";
   if (parts[0] === "imports") return parts.length === 2 && ((parts[1] === "template" && method === "GET") || (["upload", "preview", "commit"].includes(parts[1]) && method === "POST"));
   const [resource, id, action] = parts;

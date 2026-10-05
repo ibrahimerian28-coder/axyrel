@@ -1,6 +1,6 @@
 """Pydantic schemas for the Axyrel Scheduling domain."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
@@ -51,3 +51,9 @@ class ScheduleRead(ScheduleBase):
     company_id: UUID
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("start_at", "end_at")
+    @classmethod
+    def normalize_times(cls, value: datetime) -> datetime:
+        # Database output is an instant, including naive UTC from SQLite tests.
+        return value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)

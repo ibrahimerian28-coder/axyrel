@@ -13,7 +13,7 @@ from sqlalchemy.engine import Engine, make_url
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 sys.path.insert(0,str(ROOT/"tests"))
-GENERATED = re.compile(r"axyrel_(?:task(?:52|53|60)|phase3)_test_[0-9a-f]{32}")
+GENERATED = re.compile(r"axyrel_(?:task(?:52|53|59|60)|phase3)_test_[0-9a-f]{32}")
 created = set()
 
 def check_connection(url):
@@ -29,14 +29,18 @@ def check_connection(url):
 def guard_connection(dialect, record, args, kwargs):
     check_connection(dialect._regression_url)
 
-@event.listens_for(Engine,"before_cursor_execute")
+@event.listens_for(Engine,"before_cursor_execute", retval=True)
 def guard_admin(connection,cursor,statement,parameters,context,executemany):
-    if connection.engine.url.get_backend_name()!="postgresql" or connection.engine.url.database!="postgres":return
+    if connection.engine.url.get_backend_name()!="postgresql" or connection.engine.url.database!="postgres":return statement, parameters
     create=re.fullmatch(r'CREATE DATABASE "(axyrel_[a-z0-9_]+)"',statement.strip(),re.I)
     drop=re.fullmatch(r'DROP DATABASE(?: IF EXISTS)? "(axyrel_[a-z0-9_]+)"(?: WITH \(FORCE\))?',statement.strip(),re.I)
-    if create and GENERATED.fullmatch(create[1]):return
-    if drop and drop[1] in created:return
-    if statement.lstrip().upper().startswith("SELECT "):return
+    if create and GENERATED.fullmatch(create[1]):return statement, parameters
+    if drop and drop[1] in created:
+        if os.environ.get("AXYREL_RETAIN_TEST_DATABASES") == "1":
+            print("Retained generated disposable database; no DROP executed.",flush=True)
+            return "SELECT 1", ()
+        return statement, parameters
+    if statement.lstrip().upper().startswith("SELECT "):return statement, parameters
     raise RuntimeError("Regression refused unexpected PostgreSQL administration SQL.")
 
 @event.listens_for(Engine,"after_cursor_execute")

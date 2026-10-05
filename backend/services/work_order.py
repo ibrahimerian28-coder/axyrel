@@ -3,6 +3,8 @@
 from uuid import UUID
 
 from sqlalchemy.orm import Session
+from backend.core.service_lock import lock_service
+from backend.repositories.schedule import ScheduleRepository
 
 from backend.repositories.service_visit import ServiceVisitRepository
 from backend.repositories.service_request import ServiceRequestRepository
@@ -65,6 +67,7 @@ class WorkOrderService:
         return self.repository.get(db, company_id, work_order_id)
 
     def create_work_order(self, db: Session, company_id: UUID | None, data: dict):
+        lock_service(db, company_id)
         status = data.get("status", "Open")
         ensure_work_order_transition("Open", status)
         self._validate_service_request(db, company_id, data.get("service_request_id"))
@@ -77,6 +80,7 @@ class WorkOrderService:
     def update_work_order(
         self, db: Session, company_id: UUID | None, work_order_id: UUID, data: dict
     ):
+        lock_service(db, company_id)
         work_order = self.repository.get(db, company_id, work_order_id)
         if work_order is None:
             return None
@@ -88,12 +92,20 @@ class WorkOrderService:
         if target_status is not None:
             target_status = ensure_work_order_transition(work_order.status, target_status)
             data = {**data, "status": target_status}
+            if target_status == "Completed":
+                visits = self.visit_repository.list(db, company_id, work_order_id=work_order_id)
+                schedules = ScheduleRepository().list(db, company_id, work_order_id=work_order_id)
+                if any(v.status in {"Planned", "In Progress"} for v in visits) or any(s.status == "Scheduled" for s in schedules):
+                    raise ValueError("Resolve remaining appointments and active visits before completing the job")
 
         updated = self.repository.update(db, company_id, work_order_id, data)
         if updated is None:
             return None
 
         if target_status == "Cancelled":
+            for schedule in ScheduleRepository().list(db, company_id, work_order_id=work_order_id):
+                if schedule.status == "Scheduled":
+                    ScheduleRepository().update(db, company_id, schedule.id, {"status": "Cancelled"})
             visits = self.visit_repository.list(
                 db, company_id, work_order_id=work_order_id
             )
@@ -106,6 +118,7 @@ class WorkOrderService:
         return updated
 
     def delete_work_order(self, db: Session, company_id: UUID | None, work_order_id: UUID):
+        lock_service(db, company_id)
         visits = self.visit_repository.list(db, company_id, work_order_id=work_order_id)
         for visit in visits:
             if visit.status != "Cancelled":

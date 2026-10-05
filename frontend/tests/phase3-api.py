@@ -30,6 +30,9 @@ marker = root / ("frontend/test-results/phase3-database.json" if test_port == 81
 def cleanup_database(name: str):
     if not re.fullmatch(r"axyrel_phase3_test_[0-9a-f]{32}", name):
         raise RuntimeError("Refusing unexpected disposable database cleanup.")
+    if os.environ.get("AXYREL_RETAIN_TEST_DATABASES") == "1":
+        print("Retained generated disposable test database; no DROP executed.", flush=True)
+        return
     with admin.connect() as db:
         db.exec_driver_sql(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)')
     marker.unlink(missing_ok=True)

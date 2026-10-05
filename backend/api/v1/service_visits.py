@@ -8,6 +8,7 @@ from backend.services.service_visit import ServiceVisitService
 from backend.schemas.service_visit import ServiceVisitCreate, ServiceVisitUpdate, ServiceVisitRead
 from backend.api.dependencies import DBSession, CompanyID
 from backend.core.authorization import Permission, require_permission
+from backend.schemas.service_desk import Reason
 
 router = APIRouter(prefix="/service-visits", tags=["service visits"])
 service = ServiceVisitService()
@@ -96,6 +97,20 @@ def install_part(
         raise _bad_request(exc) from exc
     if record is None:
         raise HTTPException(status_code=404, detail="service_visits record not found")
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+@router.post("/{visit_id}/parts/reverse", response_model=ServiceVisitRead,
+             dependencies=[Depends(require_permission(Permission.SERVICE_MANAGE))])
+def reverse_parts(visit_id: UUID, payload: Reason, db: DBSession, company_id: CompanyID):
+    try:
+        record = service.reverse_parts(db, company_id, visit_id, payload.reason)
+    except ValueError as exc:
+        raise _bad_request(exc) from exc
+    if record is None:
+        raise HTTPException(status_code=404, detail="Visit not found")
     db.commit()
     db.refresh(record)
     return record

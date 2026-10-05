@@ -42,6 +42,11 @@ class Task74CoreWorkflows(unittest.TestCase):
             headers={'Authorization': 'Bearer ' + self.token}, json={'status': 'Completed',
                 'actual_start_at': '2026-01-15T10:05:00+02:00', 'actual_end_at': '2026-01-15T10:45:00+02:00'})
         self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(self._get('work-orders/' + order['id'])['status'], 'Open')
+        self.assertEqual(len([h for h in self._get('service-history') if h['service_visit_id'] == visit['id']]), 1)
+        response = self.client.patch('/api/v1/work-orders/' + order['id'],
+            headers={'Authorization': 'Bearer ' + self.token}, json={'status': 'Completed'})
+        self.assertEqual(response.status_code, 200, response.text)
         self.assertEqual(self._get('work-orders/' + order['id'])['status'], 'Completed')
         history = self._post('service-history', {'customer_id': customer['id'], 'asset_id': asset['id'],
             'work_order_id': order['id'], 'service_visit_id': visit['id'], 'service_type': 'Synthetic Service',

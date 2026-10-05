@@ -1,6 +1,6 @@
 """Pydantic schemas for the Axyrel Service Visit domain."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
@@ -63,3 +63,8 @@ class ServiceVisitRead(ServiceVisitBase):
     company_id: UUID
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("actual_start_at", "actual_end_at")
+    @classmethod
+    def normalize_times(cls, value: datetime | None) -> datetime | None:
+        return value.replace(tzinfo=timezone.utc) if value is not None and value.tzinfo is None else value.astimezone(timezone.utc) if value is not None else None

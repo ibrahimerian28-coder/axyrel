@@ -22,9 +22,11 @@ from backend.api.v1.service_visits import router as service_visits_router
 from backend.api.v1.technician_stock import router as technician_stock_router
 from backend.api.v1.technician_directory import router as technician_directory_router
 from backend.api.v1.work_orders import router as work_orders_router
+from backend.api.v1.service_desk import router as service_desk_router
 
 router = APIRouter()
 for _router in (
+    service_desk_router,
     asset_import_router,
     smart_import_router,
     profile_images_router,

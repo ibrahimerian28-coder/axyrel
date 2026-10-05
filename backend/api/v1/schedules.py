@@ -55,7 +55,10 @@ def update_record(schedule_id: UUID, payload: ScheduleUpdate, db: DBSession, com
 
 @router.delete("/{schedule_id}", status_code=204, dependencies=[Depends(require_permission(Permission.SERVICE_MANAGE))])
 def delete_record(schedule_id: UUID, db: DBSession, company_id: CompanyID):
-    record = service.delete_schedule(db, company_id, schedule_id)
+    try:
+        record = service.delete_schedule(db, company_id, schedule_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if record is None:
         raise HTTPException(status_code=404, detail="schedules record not found")
     db.commit()

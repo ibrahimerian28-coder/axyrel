@@ -158,13 +158,13 @@ class Task46ServiceVisitTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "Cancelled")
 
-    def test_completed_visit_can_move_to_cancelled_and_syncs_work_order(self):
+    def test_completed_visit_can_move_to_cancelled_without_terminating_job(self):
         headers = self._auth()
         work_order = self._create_work_order(headers)
         visit = self._create_visit(headers, work_order["id"], status="Completed")
 
         response = self.client.get(f"/api/v1/work-orders/{work_order['id']}", headers=headers)
-        self.assertEqual(response.json()["status"], "Completed")
+        self.assertEqual(response.json()["status"], "Open")
 
         response = self.client.patch(
             f"/api/v1/service-visits/{visit['id']}",
@@ -175,7 +175,7 @@ class Task46ServiceVisitTests(unittest.TestCase):
         self.assertEqual(response.json()["status"], "Cancelled")
 
         response = self.client.get(f"/api/v1/work-orders/{work_order['id']}", headers=headers)
-        self.assertEqual(response.json()["status"], "Cancelled")
+        self.assertEqual(response.json()["status"], "Open")
 
     def test_cancelled_visit_restores_stock_to_original_technician_after_reassignment(self):
         headers = self._auth()

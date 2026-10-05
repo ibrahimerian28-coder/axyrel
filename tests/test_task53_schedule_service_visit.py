@@ -168,18 +168,16 @@ class Task53ServiceVisitTests(unittest.TestCase):
             with self.Session() as db:
                 self.assertEqual(db.get(WorkOrder, self.order).status, "Open")
 
-    def test_different_work_orders_and_explicit_fields_are_preserved(self):
-        explicit_tech = str(uuid4())
-        created = self._create(work_order_id=str(self.other_order), technician_id=explicit_tech,
-                               actual_start_at="2026-07-15T10:00", actual_end_at="2026-07-15T11:00")
-        self.assertEqual(created.status_code, 201, created.text)
-        self.assertEqual(created.json()["work_order_id"], str(self.other_order))
-        self.assertEqual(created.json()["schedule_id"], str(self.schedule))
-        self.assertEqual(created.json()["technician_id"], explicit_tech)
-        self.assertEqual(dt(created.json()["actual_start_at"]), dt("2026-07-15T07:00Z"))
-        patched = self._patch({"work_order_id": str(self.other_order), "technician_id": explicit_tech})
+    def test_schedule_and_visit_must_belong_to_same_work_order(self):
+        before = self._count()
+        created = self._create(work_order_id=str(self.other_order))
+        self.assertEqual(created.status_code, 400, created.text)
+        self.assertEqual(self._count(), before)
+        patched = self._patch({"work_order_id": str(self.other_order)})
+        self.assertEqual(patched.status_code, 400, patched.text)
+        # Explicitly detach the appointment before administrative reassignment.
+        patched = self._patch({"work_order_id": str(self.other_order), "schedule_id": None})
         self.assertEqual(patched.status_code, 200, patched.text)
-        self.assertEqual(patched.json()["schedule_id"], str(self.schedule))
 
     def test_optional_link_omission_null_detachment_and_reassignment(self):
         linked = self._create(technician_id=None, actual_start_at=None, actual_end_at=None)

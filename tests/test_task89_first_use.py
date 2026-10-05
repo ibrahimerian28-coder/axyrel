@@ -19,7 +19,7 @@ class Task89FirstUse(unittest.TestCase):
     _start = rehearsal.Task86DeploymentRehearsal._start
 
     def test_synthetic_operator_navigation_entry_logout_and_reentry(self):
-        self.assertEqual(self._migrate().count('  OK:'), 13)
+        self.assertEqual(self._migrate().count('  OK:'), rehearsal.MIGRATION_COUNT)
         before = self._rows()
         with Session(self.engine) as db, db.begin():
             company = Company(id=uuid4(), name='Synthetic First Use', status='active')

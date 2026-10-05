@@ -36,7 +36,7 @@ class Task87ProductionSmoke(unittest.TestCase):
         return {'Authorization': 'Bearer ' + response.json()['access_token']}
 
     def test_ui_api_workflows_tenants_and_restart_persistence(self):
-        self.assertEqual(self._migrate().count('  OK:'), 13)
+        self.assertEqual(self._migrate().count('  OK:'), rehearsal.MIGRATION_COUNT)
         history = self._rows()
         identities = {}
         password_hash = hash_password('synthetic-smoke-password')
@@ -65,6 +65,8 @@ class Task87ProductionSmoke(unittest.TestCase):
             'asset_id': asset['id'], 'schedule_id': schedule['id']})
         self._request('PATCH', 'service-visits/' + visit['id'], json={'status': 'Completed',
             'actual_start_at': '2026-01-15T10:05:00+02:00', 'actual_end_at': '2026-01-15T10:45:00+02:00'})
+        self.assertEqual(self._request('GET', 'work-orders/' + order['id'])['status'], 'Open')
+        self._request('PATCH', 'work-orders/' + order['id'], json={'status': 'Completed'})
         self.assertEqual(self._request('GET', 'work-orders/' + order['id'])['status'], 'Completed')
         history_row = self._post('service-history', {'customer_id': customer['id'], 'asset_id': asset['id'],
             'work_order_id': order['id'], 'service_visit_id': visit['id'], 'service_type': 'Synthetic',
@@ -112,7 +114,7 @@ print('UI_LOGIN_OK')
         self.assertIn('UI_LOGIN_OK', ui.stdout)
         stop()
         self.assertEqual(process.returncode, 0)
-        self.assertEqual(self._migrate().count('SKIP:'), 13)
+        self.assertEqual(self._migrate().count('SKIP:'), rehearsal.MIGRATION_COUNT)
         self.base, process, output, stop = self._start(2)
         self.headers = self._login('owner')
         for resource, row in owned:

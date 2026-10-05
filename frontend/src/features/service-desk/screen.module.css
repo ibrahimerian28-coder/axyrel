@@ -1,0 +1,19 @@
+.desk { min-width: 0; }
+.summary { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:20px; }
+.summary section { display:flex; flex-direction:column; gap:6px; }
+.summary strong { font-size:1.8rem; }
+.desktop { overflow:auto; }
+.desktop table { table-layout:fixed; width:100%; }
+.desktop td { overflow-wrap:anywhere; vertical-align:top; }
+.desk small { display:block; }
+.mobile { display:none; }
+.overlay { position:fixed; inset:0; background:#01061788; z-index:50; display:flex; justify-content:flex-end; }
+.drawer { width:min(560px,100%); height:100dvh; overflow:auto; border-radius:0; margin:0; padding:24px; }
+.drawer fieldset { min-width:0; padding:0; border:0; }
+.drawer label { display:flex; flex-direction:column; gap:6px; margin-block:14px; }
+.drawer input,.drawer select,.drawer textarea { width:100%; min-width:0; }
+.drawer details { margin-block:16px; }
+.customerResults { display:flex; flex-direction:column; gap:8px; max-height:45vh; overflow:auto; }
+.customerResults button { text-align:start; }
+@media(max-width:1100px) { .desktop { display:none; } .mobile { display:grid; gap:16px; } }
+@media(max-width:600px) { .summary { grid-template-columns:repeat(2,minmax(0,1fr)); } .drawer { padding:18px; } }

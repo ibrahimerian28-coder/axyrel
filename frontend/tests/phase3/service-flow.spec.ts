@@ -34,13 +34,13 @@ test("real PostgreSQL Request → Order → Schedule → Visit → explicit Hist
   await visit.getByLabel("Actual start UTC offset (optional)", { exact: true }).fill("+03:00"); await visit.getByRole("button", { name: "Save", exact: true }).click();
   await expect(detail(page).getByRole("heading", { name: /Visit.*Browser service flow/ })).toBeVisible(); const visitId = recordId(page);
   expect((await records(page, "work-orders")).find((r: { id: string }) => r.id === orderId).status).toBe("In Progress");
-  const inventory = page.getByRole("region", { name: "Visit inventory", exact: true }); await inventory.getByLabel("Inventory item", { exact: true }).selectOption({ label: "Synthetic Filter · Technician stock 8" }); await inventory.getByLabel("Quantity", { exact: true }).fill("2"); await inventory.getByRole("button", { name: "Install part", exact: true }).click();
-  await expect(detail(page).getByRole("status")).toHaveText("Part installation recorded."); await expect(inventory).toContainText("Installed · Synthetic Filter · Quantity 2");
+  const inventory = page.getByRole("region", { name: "Visit inventory", exact: true }); await inventory.getByRole("button", { name: "Edit parts", exact: true }).click(); await inventory.getByLabel("Inventory item", { exact: true }).selectOption({ label: "Synthetic Filter · Technician stock 8" }); await inventory.getByLabel("Quantity", { exact: true }).fill("2"); await inventory.getByRole("button", { name: "Install part", exact: true }).click();
+  await expect(inventory).toContainText("Installed · Synthetic Filter · Quantity 2");
   await detail(page).getByRole("button", { name: "Edit Service Visit", exact: true }).click(); const complete = editor(page, "Edit Service Visit");
   await complete.getByLabel("Status", { exact: true }).selectOption("Completed"); await complete.getByLabel("Actual end (Cairo)", { exact: true }).fill("2026-10-05T11:00"); await complete.getByLabel("Actual end UTC offset (optional)", { exact: true }).fill("+03:00"); await complete.getByRole("button", { name: "Save", exact: true }).click();
   await expect(detail(page).locator(".profile-header .badge")).toHaveText("Completed"); await page.reload(); await expect(detail(page).locator(".profile-header .badge")).toHaveText("Completed");
-  expect((await records(page, "work-orders")).find((r: { id: string }) => r.id === orderId).status).toBe("Completed");
-  // Explicit accepted API record, never inferred from visit completion.
+  expect((await records(page, "work-orders")).find((r: { id: string }) => r.id === orderId).status).toBe("Open");
+  // Automatic completion history coexists with explicit administrative history.
   const storedVisit = (await records(page, "service-visits")).find((r: { id: string }) => r.id === visitId);
   const response = await page.request.post("/api/backend/service-history", { headers: origin, data: { customer_id: storedVisit.customer_id, asset_id: storedVisit.asset_id, work_order_id: orderId, service_visit_id: visitId, technician_id: storedVisit.technician_id, service_type: "Inspection", service_date: "2026-10-05T11:00:00", summary: "Explicit browser inspection record" } }); expect(response.status()).toBe(201);
   await page.getByRole("button", { name: "Refresh records", exact: true }).click(); await detail(page).getByRole("button", { name: /Explicit browser inspection record/ }).click();
