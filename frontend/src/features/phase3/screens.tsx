@@ -5,11 +5,13 @@ import { api } from "@/lib/api/client";
 import type { User } from "@/lib/api/types";
 import { label, useRecords, type Row } from "@/features/phase2/screens";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/states";
-import { currentWeek, errorMessage, eventLabel, resourceFor, serviceLabel, singular, type ServiceModule } from "./contracts";
+import { currentWeek, errorMessage, eventLabel, scheduleEventLabel, resourceFor, serviceLabel, singular, type ServiceModule } from "./contracts";
 import { ServiceEditor } from "./editor";
 import { WeekSchedule } from "./calendar";
 
 import { requestPriorities, requestStatuses, requestValue } from "./request-values";
+
+const workScheduleLabels:Record<string,string>={description:"Description",priority:"Priority",notes:"Notes",source:"Source",start_at:"Start",end_at:"End"};
 
 type Navigate = (module: string, id?: string) => void;
 export function ServiceScreen({ module, user, selectedId, go }: { module: ServiceModule; user: User; selectedId?: string; go: Navigate }) {
@@ -29,7 +31,9 @@ export function ServiceScreen({ module, user, selectedId, go }: { module: Servic
   const recordName = (kind: ServiceModule, row: Row) => serviceLabel(kind, row, orders);
   const customerFor = (row: Row) => data.customers.find(c => c.id === (row.customer_id || orders.find(o => o.id === row.work_order_id)?.customer_id));
   const statusLabel=(value:unknown)=>module==="Requests"?requestValue(value,requestStatuses):String(value??"");
-  const priorityLabel=(value:unknown)=>module==="Requests"?requestValue(value,requestPriorities):String(value??"");
+  const priorityLabel=(value:unknown)=>(module==="Requests"||module==="Work Orders")?requestValue(value,requestPriorities):String(value??"");
+  const detailLabel=(field:string)=>(module==="Work Orders"||module==="Schedule")?workScheduleLabels[field]||field.replaceAll("_"," "):field.replaceAll("_"," ");
+  const detailTime=module==="Work Orders"||module==="Schedule"?scheduleEventLabel:eventLabel;
   const statusOptions=module==="Requests"?[...requestStatuses,...Array.from(new Set(rows.map(r=>String(r.status)))).filter(value=>!requestStatuses.includes(requestValue(value,requestStatuses)))]:Array.from(new Set(rows.map(r=>String(r.status))));
   const filtered = rows.filter(r => (!status || statusLabel(r.status) === status) && (!customerFilter || customerFor(r)?.id === customerFilter) && [recordName(module, r), customerFor(r)?.name, r.description, r.notes, r.priority].join(" ").toLowerCase().includes(search.toLowerCase()));
   function selectRecord(row: Row) { setEdit(null); setConfirmDelete(false); setError(""); setNotice(""); go(module, row.id); }
@@ -50,8 +54,8 @@ export function ServiceScreen({ module, user, selectedId, go }: { module: Servic
     <section className="panel service-detail" aria-label="Service record details">{!selected ? <EmptyState title={selectedId && !selectedId.startsWith("new:") ? "Record unavailable" : "Select a record"} description="Choose a record to see its details and service flow." /> : <><div className="profile-header"><div><h2>{recordName(module, selected)}</h2><span className="badge">{statusLabel(selected.status)}</span></div>{canManage && <div className="actions"><button onClick={() => { setEdit("edit"); setConfirmDelete(false); }}>Edit {singular[module]}</button><button onClick={() => setConfirmDelete(true)}>Delete {singular[module]}</button></div>}</div>{confirmDelete && <section className="delete-confirm" aria-label="Confirm record deletion"><h3>Delete this {singular[module].toLowerCase()}?</h3><p>{module === "Work Orders" || module === "Service Visits" ? "The backend applies its visit cancellation and installed-stock reversal rules." : "The record will be removed from the active workspace using the existing deletion rules."}</p><button disabled={pending} onClick={() => { void remove(); }}>Confirm delete</button><button disabled={pending} onClick={() => setConfirmDelete(false)}>Keep record</button></section>}
     <dl className="detail-fields">{reference("Customers", selected.customer_id || order?.customer_id, "Customer", data.customers)}{reference("Assets", selected.asset_id || (module === "Schedule" ? order?.asset_id : undefined), "Asset", data.assets)}{module === "Work Orders" && reference("Requests", selected.service_request_id, "Service Request", data["service-requests"])}{(module === "Schedule" || module === "Service Visits" || module === "Service History") && reference("Work Orders", selected.work_order_id, "Work Order", orders)}{module === "Service Visits" && reference("Schedule", selected.schedule_id, "Schedule", data.schedules, r => recordName("Schedule", r))}{module === "Service History" && reference("Service Visits", selected.service_visit_id, "Service Visit", data["service-visits"], r => recordName("Service Visits", r))}
     {(module === "Work Orders" || module === "Schedule" || module === "Service Visits" || module === "Service History") && <div><dt>Technician</dt><dd>{data.technicians.find(t => t.id === (selected.assigned_technician_id || selected.technician_id))?.display_name || ((selected.assigned_technician_id || selected.technician_id) ? "Unavailable technician" : "Unassigned")}</dd></div>}
-    {["description", "priority", "source", "notes", "service_type", "summary"].filter(key => selected[key]).map(key => <div key={key}><dt>{key.replaceAll("_", " ")}</dt><dd>{key==="priority"?priorityLabel(selected[key]):selected[key]}</dd></div>)}
-    {["start_at", "end_at", "actual_start_at", "actual_end_at"].filter(key => selected[key]).map(key => <div key={key}><dt>{key.replaceAll("_", " ")} (Cairo)</dt><dd>{eventLabel(selected[key])}</dd></div>)}{module === "Service History" && <div><dt>Service date (as recorded)</dt><dd>{String(selected.service_date).replace("T", " ")}</dd></div>}
+    {["description", "priority", "source", "notes", "service_type", "summary"].filter(key => selected[key]).map(key => <div key={key}><dt>{detailLabel(key)}</dt><dd>{key==="priority"?priorityLabel(selected[key]):selected[key]}</dd></div>)}
+    {["start_at", "end_at", "actual_start_at", "actual_end_at"].filter(key => selected[key]).map(key => <div key={key}><dt>{detailLabel(key)} (Cairo)</dt><dd>{detailTime(selected[key])}</dd></div>)}{module === "Service History" && <div><dt>Service date (as recorded)</dt><dd>{String(selected.service_date).replace("T", " ")}</dd></div>}
     </dl>
     {module === "Requests" && <>{canManage && <button className="primary" onClick={() => go("Work Orders", `new:${selected.id}`)}>Create Work Order</button>}{related("Work Orders", orders.filter(r => r.service_request_id === selected.id))}</>}
     {module === "Work Orders" && <>{canManage && <div className="actions"><button className="primary" onClick={() => go("Schedule", `new:${selected.id}`)}>Add Schedule</button><button onClick={() => go("Service Visits", `new:order:${selected.id}`)}>Add Service Visit</button></div>}{related("Schedule", data.schedules.filter(r => r.work_order_id === selected.id))}{related("Service Visits", data["service-visits"].filter(r => r.work_order_id === selected.id))}{related("Service History", data["service-history"].filter(r => r.work_order_id === selected.id))}</>}

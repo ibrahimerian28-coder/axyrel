@@ -3,7 +3,9 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
+
+from backend.schemas.service_request import request_choice
 
 
 class WorkOrderBase(BaseModel):
@@ -21,7 +23,10 @@ class WorkOrderBase(BaseModel):
 
 
 class WorkOrderCreate(WorkOrderBase):
-    pass
+    @field_validator("priority")
+    @classmethod
+    def canonical_priority(cls, value):
+        return request_choice(value, "priority")
 
 
 class WorkOrderUpdate(BaseModel):
@@ -36,6 +41,12 @@ class WorkOrderUpdate(BaseModel):
     scheduled_start: datetime | None = None
     scheduled_end: datetime | None = None
     notes: str | None = None
+
+    # Omitted PATCH priority leaves historical stored values untouched.
+    @field_validator("priority")
+    @classmethod
+    def canonical_priority(cls, value):
+        return request_choice(value, "priority")
 
 
 class WorkOrderRead(WorkOrderBase):

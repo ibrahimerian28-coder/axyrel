@@ -17,6 +17,12 @@ export function eventInput(value?: string | number | null) {
   return { local: `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`, offset: parts.timeZoneName.replace("GMT", "") || "Z" };
 }
 export function eventLabel(value?: string | number | null) { if (!value) return "Not recorded"; const date = instant(String(value)); return Number.isNaN(date.valueOf()) ? "Time unavailable" : cairo.format(date); }
+// Read-only Schedule presentation; the numeric formatter used by eventInput
+// and every timestamp/offset conversion above remain unchanged.
+const scheduleDisplay = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Cairo", year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZoneName: "longOffset" });
+const calendarDisplay = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", weekday: "short", year: "numeric", month: "short", day: "2-digit" });
+export function scheduleEventLabel(value?: string | number | null) { if (!value) return "Not recorded"; const date = instant(String(value)); return Number.isNaN(date.valueOf()) ? "Time unavailable" : scheduleDisplay.format(date); }
+export function calendarDateLabel(day: string) { return calendarDisplay.format(new Date(`${day}T12:00:00Z`)); }
 export function dayKey(value: string) { return eventInput(value).local.slice(0, 10); }
 export function addDays(day: string, amount: number) { const date = new Date(`${day}T12:00:00Z`); date.setUTCDate(date.getUTCDate() + amount); return date.toISOString().slice(0, 10); }
 export function currentWeek() { const today = dayKey(new Date().toISOString()); const weekday = new Date(`${today}T12:00:00Z`).getUTCDay(); return addDays(today, -((weekday + 6) % 7)); }
@@ -24,7 +30,7 @@ export function serviceLabel(module: ServiceModule, row: Row, orders: Row[]) {
   if (module === "Requests" || module === "Work Orders") return label(row);
   if (module === "Service History") return String(row.summary || row.service_type || "Service history");
   const order = orders.find(o => o.id === row.work_order_id);
-  return `${module === "Schedule" ? "Schedule" : "Visit"} · ${label(order)} · ${eventLabel(row.start_at || row.actual_start_at || row.created_at)}`;
+  return `${module === "Schedule" ? "Schedule" : "Visit"} · ${label(order)} · ${(module === "Schedule" ? scheduleEventLabel : eventLabel)(row.start_at || row.actual_start_at || row.created_at)}`;
 }
 export function errorMessage(error: unknown) {
   if (!(error instanceof ApiError)) return "The action could not be completed. Please try again.";
