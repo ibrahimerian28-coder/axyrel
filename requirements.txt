@@ -17,3 +17,5 @@ Pillow>=12.3.0,<13.0
 
 phonenumberslite==9.0.40
 pycountry==26.2.16
+openpyxl==3.1.5
+defusedxml==0.7.1

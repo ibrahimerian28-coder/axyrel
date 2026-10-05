@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from backend.repositories.customer import CustomerRepository
 from backend.services.create_text import trimmed_required_text
 from backend.services.customer_phones import prepare_phones
+from backend.core.asset_lock import lock_assets
 
 class CustomerService:
     def __init__(self, repository=None):
@@ -17,16 +18,19 @@ class CustomerService:
         return self.repository.get(db, company_id, customer_id)
 
     def create_customer(self, db, company_id, data):
+        lock_assets(db, company_id)
         name = trimmed_required_text(data["name"], "Name is required.")
         data = {**data, "name": name}
         return self.repository.create(db, company_id, prepare_phones(data))
 
     def update_customer(self, db, company_id, customer_id, data):
+        lock_assets(db, company_id)
         customer = self.repository.get(db, company_id, customer_id)
         if customer is None: return None
         return self.repository.update(db, company_id, customer_id, prepare_phones(data, customer))
 
     def delete_customer(self, db, company_id, customer_id):
+        lock_assets(db, company_id)
         return self.repository.soft_delete(db, company_id, customer_id)
 
     @staticmethod

@@ -4,6 +4,7 @@ const resources = new Set(["customers", "assets", "service-requests", "work-orde
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function allowed(parts: string[], method: string) {
   if (parts.join("/") === "auth/me") return method === "GET";
+  if (parts[0] === "imports") return parts.length === 2 && ((parts[1] === "template" && method === "GET") || (["upload", "preview", "commit"].includes(parts[1]) && method === "POST"));
   const [resource, id, action] = parts;
   if (!resources.has(resource) || parts.length > 3) return false;
   if (resource === "assets" && id === "import") return parts.length === 3 && ((action === "template" && method === "GET") || (["validate", "commit"].includes(action) && method === "POST"));
@@ -53,7 +54,7 @@ async function forward(request: Request, context: { params: Promise<{ path: stri
     }
     let requestBody: string | undefined;
     if (request.method !== "GET") {
-      if (path[1] === "import") {
+      if (path[1] === "import" || path[0] === "imports") {
         const reader = request.body?.getReader(); const chunks: Uint8Array[] = []; let size = 0;
         if (reader) try { while (true) { const { done, value } = await reader.read(); if (done) break; size += value.byteLength; if (size > 7 * 1024 * 1024) { await reader.cancel(); return NextResponse.json({ detail: "Import request is too large." }, { status: 413 }); } chunks.push(value); } } finally { reader.releaseLock(); }
         const bytes = new Uint8Array(size); let offset = 0; for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; } requestBody = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
