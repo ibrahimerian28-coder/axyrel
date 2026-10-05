@@ -15,12 +15,14 @@ from backend.models.customer import Customer
 from backend.models.audit_log import AuditLog
 from backend.schemas.asset import AssetCreate
 from backend.services.asset import AssetService
+from backend.services.asset_details import prepare_asset_details
 from backend.core.asset_lock import lock_assets
 
 MAX_BYTES = 1024 * 1024
 MAX_ROWS = 1000
 FIELDS = ["customer_reference", "asset_type", "serial_number", "model", "manufacturer",
-          "installation_date", "warranty_start", "warranty_end", "status", "notes"]
+          "installation_date", "warranty_start", "warranty_end", "status", "notes",
+          "country", "state", "area", "address", "location_url", "maintenance_cycle", "warranty_years"]
 
 
 def serial_key(value):
@@ -66,7 +68,7 @@ def validate_csv(db, company_id, source):
             if not data.get("status"): data["status"] = "Active"
             if not str(data.get("asset_type") or "").strip(): error(row_number, "asset_type", "required", "Asset type is required.")
             if data["status"] == "Deleted": error(row_number, "status", "status", "Import cannot create deleted Assets.")
-            for field, limit in {"asset_type":150, "serial_number":150, "model":150, "manufacturer":150, "status":30, "notes":1000}.items():
+            for field, limit in {"asset_type":150, "serial_number":150, "model":150, "manufacturer":150, "status":30, "notes":1000, "country":2, "state":150, "area":150, "address":500, "location_url":1000}.items():
                 if data.get(field) and len(data[field]) > limit: error(row_number, field, "length", f"Maximum {limit} characters.")
             serial = serial_key(data.get("serial_number"))
             if serial:
@@ -78,11 +80,19 @@ def validate_csv(db, company_id, source):
             if matches:
                 data["customer_id"] = matches[0].id
                 try:
-                    validated = AssetCreate.model_validate(data).model_dump()
+                    for numeric in ["maintenance_cycle", "warranty_years"]:
+                        if data.get(numeric) is not None:
+                            if not re.fullmatch(r"[0-9]+", data[numeric]): raise ValueError(numeric)
+                            data[numeric] = int(data[numeric])
+                    validated = AssetCreate.model_validate(data).model_dump(exclude_unset=True)
+                    validated = prepare_asset_details(validated)
                     prepared.append(validated)
+                    data = validated
                 except ValidationError as exc:
                     for problem in exc.errors(include_input=False):
                         error(row_number, str(problem["loc"][0]), "field_type", "Invalid field value; dates must use YYYY-MM-DD.")
+                except ValueError as exc:
+                    error(row_number, getattr(exc, "field", str(exc) if str(exc) in {"maintenance_cycle", "warranty_years"} else "row"), "field_value", "Invalid location, URL or whole-number service duration.")
                 preview.append({"row":row_number, "customer":matches[0].name, **{k:str(v) if v is not None else "" for k,v in data.items() if k != "customer_id"}})
     except (csv.Error, UnicodeError):
         error(0, "file", "csv", "Malformed UTF-8 CSV; use comma-separated columns and valid quoting.")

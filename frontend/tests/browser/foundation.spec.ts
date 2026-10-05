@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 async function login(page: import("@playwright/test").Page, role = "admin") {
-  await page.goto("/login"); await page.getByLabel("Email", { exact: true }).fill(`${role}@example.test`); await page.getByLabel("Password", { exact: true }).fill("synthetic-password"); await page.getByRole("button", { name: "Sign in", exact: true }).click(); await expect(page.getByRole("heading", { name: "Workspace", exact: true })).toBeVisible();
+  await page.goto("/login"); await page.getByLabel("Email", { exact: true }).fill(`${role}@example.test`); await page.getByLabel("Password", { exact: true }).fill("synthetic-password"); await page.getByRole("button", { name: "Sign in", exact: true }).click(); await expect(page).toHaveURL(/module=Dashboard/); await expect(page.locator(".identity")).toBeVisible();
 }
 test("login, role navigation, unchanged logo and logout session cleanup", async ({ page, context }) => {
   await login(page);

@@ -23,7 +23,7 @@ async def payload(request):
 
 @router.get("/template")
 def template():
-    return {"csv": ",".join(FIELDS) + "\n", "max_bytes":1048576, "max_rows":1000}
+    return {"csv": ",".join(f for f in FIELDS if f not in {"warranty_start", "warranty_end"}) + "\n", "max_bytes":1048576, "max_rows":1000}
 
 @router.post("/validate")
 async def validate(request: Request, db: DBSession, company_id: CompanyID, context: CurrentAuthContext):

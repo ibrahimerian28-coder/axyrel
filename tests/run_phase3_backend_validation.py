@@ -19,6 +19,10 @@ if url.get_backend_name() != "postgresql" or url.host not in {"localhost", "127.
 modules = ["test_task51_request_work_order_integration", "test_task52_work_order_scheduling",
            "test_task53_schedule_service_visit", "test_task54_visit_history_integration",
            "test_task55_work_order_inventory"]
-suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromName(name) for name in modules)
-result = unittest.TextTestRunner(verbosity=2).run(suite)
-raise SystemExit(0 if result.wasSuccessful() else 1)
+import subprocess
+failed=[]
+for name in modules:
+    print("ISOLATED MODULE:",name,flush=True)
+    result=subprocess.run([sys.executable,"-B",str(Path(__file__).resolve().parent/"isolated_backend_suite.py"),name],cwd=Path(__file__).resolve().parents[1])
+    if result.returncode: failed.append(name)
+raise SystemExit(1 if failed else 0)

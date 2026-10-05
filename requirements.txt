@@ -14,3 +14,6 @@ PyJWT>=2.9,<3.0
 
 python-multipart>=0.0.20,<1.0
 Pillow>=12.3.0,<13.0
+
+phonenumberslite==9.0.40
+pycountry==26.2.16

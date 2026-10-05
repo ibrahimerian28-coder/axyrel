@@ -94,6 +94,33 @@ def initialize():
     finally:engine.dispose()
 
 
+def migrate():
+    """Apply only owner-approved additive migrations to the identified review DB."""
+    config=json.loads(CONFIG.read_text()); engine=verify(config)
+    try:
+        if not config.get("ready"): raise RuntimeError("Review initialization is incomplete.")
+        from backend.scripts.init_database import apply_migrations
+        apply_migrations(engine, ROOT/"migrations")
+    finally: engine.dispose()
+
+
+def repair_image_permissions():
+    """Repair Python 3.13 creator-only Windows directories, preserving files."""
+    config=json.loads(CONFIG.read_text()); engine=verify(config); engine.dispose()
+    root=STATE/"images"
+    if os.name!="nt": return
+    if root.is_symlink(): raise RuntimeError("Unexpected image-root link; refusing ACL repair.")
+    owner=subprocess.check_output(["powershell.exe","-NoProfile","-Command","(Get-Acl -LiteralPath '"+str(ROOT).replace("'","''")+"').Owner"],text=True).strip()
+    identity=subprocess.check_output(["whoami"],text=True).strip()
+    # Touch only directories/files physically beneath the verified private image root.
+    for path in [root,*root.rglob("*")]:
+        if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()):
+            raise RuntimeError("Unexpected private image link; refusing ACL repair.")
+        grant=[identity+":(OI)(CI)F",owner+":(OI)(CI)F"] if path.is_dir() else [identity+":F",owner+":F"]
+        subprocess.run(["icacls",str(path),"/grant:r",*grant],check=True,capture_output=True)
+    print("Private image permissions repaired for the review account; files retained.")
+
+
 def serve():
     config=json.loads(CONFIG.read_text());engine=verify(config);engine.dispose()
     if not config.get("ready"):raise RuntimeError("Owner review initialization is incomplete.")
@@ -108,8 +135,10 @@ def serve():
 
 
 if __name__=="__main__":
-    parser=argparse.ArgumentParser();parser.add_argument("action",choices=["init","verify","serve"]);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument("action",choices=["init","verify","serve","migrate","repair-images"]);args=parser.parse_args()
     if args.action=="init":initialize()
     elif args.action=="verify":
         engine=verify(json.loads(CONFIG.read_text()));engine.dispose();print("Owner review database identity verified.")
+    elif args.action=="migrate":migrate()
+    elif args.action=="repair-images":repair_image_permissions()
     else:serve()

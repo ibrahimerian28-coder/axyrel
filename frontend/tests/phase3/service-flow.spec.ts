@@ -1,10 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 
-async function login(page: Page, role = "admin") { await page.goto("/login"); await page.getByLabel("Email", { exact: true }).fill(`${role}@example.test`); await page.getByLabel("Password", { exact: true }).fill("synthetic-password"); await page.getByRole("button", { name: "Sign in", exact: true }).click(); await expect(page.getByRole("heading", { name: "Workspace", exact: true })).toBeVisible(); }
+async function login(page: Page, role = "admin") { await page.goto("/login"); await page.getByLabel("Email", { exact: true }).fill(`${role}@example.test`); await page.getByLabel("Password", { exact: true }).fill("synthetic-password"); await page.getByRole("button", { name: "Sign in", exact: true }).click(); await expect(page).toHaveURL(/module=Dashboard/); await expect(page.locator(".identity")).toBeVisible(); }
 async function module(page: Page, name: string) { if (await page.locator("nav").isHidden()) await page.getByRole("button", { name: "Toggle navigation" }).click(); await page.locator("nav").getByRole("button", { name, exact: true }).click(); }
 function editor(page: Page, label: string) { return page.getByRole("region", { name: label, exact: true }); }
 const detail = (page: Page) => page.getByRole("region", { name: "Service record details", exact: true });
-const origin = { Origin: "http://127.0.0.1:3130" };
+const origin = { Origin: `http://127.0.0.1:${process.env.AXYREL_TEST_FRONTEND_PORT||3130}` };
 const recordId = (page: Page) => new URL(page.url()).searchParams.get("record")!;
 async function records(page: Page, resource: string) { const response = await page.request.get(`/api/backend/${resource}`); expect(response.ok()).toBe(true); return response.json(); }
 

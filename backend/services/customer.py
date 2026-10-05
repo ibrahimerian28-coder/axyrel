@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy.orm import Session
 from backend.repositories.customer import CustomerRepository
 from backend.services.create_text import trimmed_required_text
+from backend.services.customer_phones import prepare_phones
 
 class CustomerService:
     def __init__(self, repository=None):
@@ -18,10 +19,12 @@ class CustomerService:
     def create_customer(self, db, company_id, data):
         name = trimmed_required_text(data["name"], "Name is required.")
         data = {**data, "name": name}
-        return self.repository.create(db, company_id, data)
+        return self.repository.create(db, company_id, prepare_phones(data))
 
     def update_customer(self, db, company_id, customer_id, data):
-        return self.repository.update(db, company_id, customer_id, data)
+        customer = self.repository.get(db, company_id, customer_id)
+        if customer is None: return None
+        return self.repository.update(db, company_id, customer_id, prepare_phones(data, customer))
 
     def delete_customer(self, db, company_id, customer_id):
         return self.repository.soft_delete(db, company_id, customer_id)

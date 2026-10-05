@@ -31,8 +31,8 @@ def run(action):
         if action == "write":
             if state_file.exists(): raise RuntimeError("A previous synthetic persistence case needs review before another run.")
             tag = "Synthetic Persistence " + uuid4().hex
-            customer = client.post("/api/v1/customers", headers=headers, json={"name":tag}).json()
-            asset = client.post("/api/v1/assets", headers=headers, json={"customer_id":customer["id"], "asset_type":tag, "serial_number":tag}).json()
+            customer = client.post("/api/v1/customers", headers=headers, json={"name":tag,"phones":[{"country":"EG","number":"01000000002","label":"Primary"}]}).json()
+            asset = client.post("/api/v1/assets", headers=headers, json={"customer_id":customer["id"], "asset_type":tag, "serial_number":tag,"country":"EG","state":"EG-C","area":"Cairo","address":"Synthetic restart address","installation_date":"2024-02-29","maintenance_cycle":6,"warranty_years":1}).json()
             saved = {"tag":tag,"customers":customer["id"],"assets":asset["id"],"hashes":{}}
             state_file.write_text(json.dumps(saved))
             for kind in ["customers", "assets"]:
@@ -47,6 +47,11 @@ def run(action):
                 path=f'/api/v1/{kind}/{saved[kind]}'
                 response=client.get(path,headers=headers);assert response.status_code==200
                 assert response.json()["name" if kind=="customers" else "asset_type"]==saved["tag"]
+                if kind=="customers": assert response.json()["phones"][0]["normalized"]=="+201000000002"
+                else:
+                    assert response.json()["state"]=="EG-C"
+                    assert response.json()["warranty_end"]=="2025-02-28"
+                    assert response.json()["maintenance_cycle"]==6
                 if action=="read":
                     image=client.get(path+"/image",headers=headers);assert image.status_code==200
                     assert hashlib.sha256(image.content).hexdigest()==saved["hashes"][kind]

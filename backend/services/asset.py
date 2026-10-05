@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from backend.repositories.asset import AssetRepository
 from backend.repositories.customer import CustomerRepository
+from backend.services.asset_details import prepare_asset_details
 
 
 class AssetService:
@@ -49,7 +50,7 @@ class AssetService:
         data: dict,
     ):
         self._validate_customer(db, company_id, data.get("customer_id"))
-        return self.repository.create(db, company_id, data)
+        return self.repository.create(db, company_id, prepare_asset_details(data))
 
     def update_asset(
         self,
@@ -62,7 +63,7 @@ class AssetService:
             return None
         if "customer_id" in data:
             self._validate_customer(db, company_id, data["customer_id"])
-        return self.repository.update(db, company_id, asset_id, data)
+        return self.repository.update(db, company_id, asset_id, prepare_asset_details(data, self.repository.get(db, company_id, asset_id)))
 
     def delete_asset(
         self,

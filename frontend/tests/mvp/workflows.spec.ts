@@ -1,10 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
-async function login(page:Page,role="admin") { await page.goto("/login"); await page.getByLabel("Email",{exact:true}).fill(`${role}@example.test`); await page.getByLabel("Password",{exact:true}).fill("synthetic-password"); await page.getByRole("button",{name:"Sign in",exact:true}).click(); await expect(page.getByRole("heading",{name:"Workspace",exact:true})).toBeVisible(); }
+async function login(page:Page,role="admin") { await page.goto("/login"); await page.getByLabel("Email",{exact:true}).fill(`${role}@example.test`); await page.getByLabel("Password",{exact:true}).fill("synthetic-password"); await page.getByRole("button",{name:"Sign in",exact:true}).click(); await expect(page).toHaveURL(/module=Dashboard/); await expect(page.locator(".identity")).toBeVisible(); }
 async function module(page:Page,name:string) { if(await page.locator("nav").isHidden()) await page.getByRole("button",{name:"Toggle navigation"}).click(); await page.locator("nav").getByRole("button",{name,exact:true}).click(); }
 const detail=(page:Page)=>page.getByRole("region",{name:"MVP record details"});
 const editor=(page:Page,name:string)=>page.getByRole("region",{name});
 async function upload(page:Page,source:string) {await page.getByLabel("CSV file").setInputFiles({name:"assets.csv",mimeType:"text/csv",buffer:Buffer.from(source)}); await page.getByRole("button",{name:"Validate and preview",exact:true}).click();}
-const origin={Origin:"http://127.0.0.1:3130"};
+const origin={Origin:`http://127.0.0.1:${process.env.AXYREL_TEST_FRONTEND_PORT||3130}`};
 
 test("CSV preview, structured errors, confirmation and lost-response safe retry",async({page})=>{
  await login(page);await module(page,"Assets");await page.getByRole("button",{name:"Import Assets",exact:true}).click();

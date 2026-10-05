@@ -36,7 +36,10 @@ def create_record(payload: CustomerCreate, db: DBSession, company_id: CompanyID)
 
 @router.patch("/{customer_id}", response_model=CustomerRead, dependencies=[Depends(require_permission(Permission.CUSTOMER_MANAGE))])
 def update_record(customer_id: UUID, payload: CustomerUpdate, db: DBSession, company_id: CompanyID):
-    record = service.update_customer(db, company_id, customer_id, payload.model_dump(exclude_unset=True))
+    try:
+        record = service.update_customer(db, company_id, customer_id, payload.model_dump(exclude_unset=True))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if record is None:
         raise HTTPException(status_code=404, detail="customers record not found")
     db.commit()

@@ -26,6 +26,14 @@ class Asset(Base):
     model: Mapped[str | None] = mapped_column(String(150))
     manufacturer: Mapped[str | None] = mapped_column(String(150))
 
+    country: Mapped[str | None] = mapped_column(String(2))
+    state: Mapped[str | None] = mapped_column(String(150))
+    area: Mapped[str | None] = mapped_column(String(150))
+    address: Mapped[str | None] = mapped_column(String(500))
+    location_url: Mapped[str | None] = mapped_column(String(1000))
+    maintenance_cycle: Mapped[int | None] = mapped_column(Integer)
+    warranty_years: Mapped[int | None] = mapped_column(Integer)
+
     installation_date: Mapped[date | None] = mapped_column(Date)
     warranty_start: Mapped[date | None] = mapped_column(Date)
     warranty_end: Mapped[date | None] = mapped_column(Date)

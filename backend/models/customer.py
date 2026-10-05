@@ -1,6 +1,7 @@
 from datetime import date
 from uuid import UUID, uuid4
-from sqlalchemy import Date, Integer, String
+from sqlalchemy import Date, Integer, String, JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 from backend.models.base import Base
 
@@ -15,6 +16,7 @@ class Customer(Base):
     phone_2: Mapped[str | None] = mapped_column(String(50))
     phone_3: Mapped[str | None] = mapped_column(String(50))
     phone_4: Mapped[str | None] = mapped_column(String(50))
+    phones: Mapped[list | None] = mapped_column(JSON().with_variant(JSONB(), "postgresql"), nullable=True)
     address: Mapped[str | None] = mapped_column(String(500))
     area: Mapped[str | None] = mapped_column(String(150))
     location_url: Mapped[str | None] = mapped_column(String(1000))

@@ -64,3 +64,10 @@ After a Windows Playwright shutdown, run `.\.venv\Scripts\python.exe -B frontend
 ## Remaining MVP operations
 
 Inventory items, existing record-only transactions, Technician Stock, Invoices, Expenses, backend Profitability and real-data Reports are available. No warehouse transfer API or fabricated historical metrics were added. Run `npm.cmd run test:mvp` from frontend. From the repository root, run `.\.venv\Scripts\python.exe -B tests/test_asset_csv_import.py` and `.\.venv\Scripts\python.exe -B tests/run_mvp_backend_regressions.py`. Use isolated disposable PostgreSQL fixtures for these suites; never point them at owner-review or production data.
+
+
+## Owner Acceptance Remediation Round 1
+
+Login opens Dashboard and the redundant Workspace navigation item is removed; the shell/module URLs remain compatible. Customers have an optional dynamic labeled phone collection (up to 100), with Egypt default, server E.164 validation and legacy preservation. Asset profiles now hold country/state/locality/address/location URL, maintenance cycle in months and warranty period in whole calendar years; the backend calculates the warranty end. See OWNER_ROUND1_REMEDIATION_REPORT.md and design-references/GEOGRAPHIC_REFERENCE.md.
+
+Run focused browser validation with `npx.cmd playwright test --config playwright.round1.config.ts`. For isolated PostgreSQL suites use `tests/isolated_backend_suite.py test_owner_round1` or the regression runners; their connection guards reject configured application and Owner Review targets. Windows browser suites need permission to clean up their own spawned test servers. Disposable API/frontend ports can be configured with AXYREL_PHASE3_TEST_PORT and AXYREL_TEST_FRONTEND_PORT; request Origin assertions follow that configured origin. On Windows, clean only the generated marker-identified disposable database using the fixture's --cleanup with the matching AXYREL_PHASE3_TEST_PORT. Never use owner-review as a regression target.

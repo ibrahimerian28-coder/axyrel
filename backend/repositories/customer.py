@@ -1,5 +1,5 @@
 from uuid import UUID
-from sqlalchemy import func, select
+from sqlalchemy import func, select, String
 from sqlalchemy.orm import Session
 from backend.core.tenant_isolation import require_company_id
 from backend.models.customer import Customer
@@ -20,6 +20,7 @@ class CustomerRepository(TenantScopedRepository):
                 Customer.name.ilike(term) | Customer.phone.ilike(term) |
                 Customer.phone_1.ilike(term) | Customer.phone_2.ilike(term) |
                 Customer.phone_3.ilike(term) | Customer.phone_4.ilike(term) |
+                Customer.phones.cast(String).ilike(term) |
                 Customer.area.ilike(term)
             )
         return db.scalars(stmt.order_by(Customer.area, Customer.display_id, Customer.name)).all()

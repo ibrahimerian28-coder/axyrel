@@ -22,7 +22,9 @@ if url.get_backend_name() != "postgresql" or url.host not in {"localhost", "127.
     raise RuntimeError("Phase 3 review requires local PostgreSQL, never a remote target.")
 database_name = "axyrel_phase3_test_" + uuid4().hex
 admin = create_engine(url.set(database="postgres"), isolation_level="AUTOCOMMIT")
-marker = root / "frontend/test-results/phase3-database.json"
+test_port = int(os.environ.get("AXYREL_PHASE3_TEST_PORT", "8130"))
+if not 1024 <= test_port <= 65535: raise RuntimeError("Invalid disposable API test port.")
+marker = root / ("frontend/test-results/phase3-database.json" if test_port == 8130 else f"frontend/test-results/phase3-database-{test_port}.json")
 
 
 def cleanup_database(name: str):
@@ -123,4 +125,4 @@ if __name__ == "__main__":
     else:
         import uvicorn
         with synthetic_application() as app:
-            uvicorn.run(app, host="127.0.0.1", port=8130, log_level="warning", access_log=False)
+            uvicorn.run(app, host="127.0.0.1", port=test_port, log_level="warning", access_log=False)

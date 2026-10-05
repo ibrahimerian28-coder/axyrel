@@ -45,7 +45,7 @@ class PrivateLocalImageStorage:
 
     def replace(self, key: str, content: bytes) -> None:
         target = self._path(key)
-        target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        target.parent.mkdir(parents=True, exist_ok=True, mode=0o777 if os.name == "nt" else 0o700)
         temporary = None
         try:
             with NamedTemporaryFile(dir=target.parent, delete=False) as stream:

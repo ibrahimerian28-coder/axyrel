@@ -12,7 +12,7 @@ export default function Login() {
     try {
       const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: data.get("email"), password: data.get("password") }) });
       if (!response.ok) { const body = await response.json(); setError(body.detail); return; }
-      cache.clear(); router.replace("/workspace");
+      cache.clear(); router.replace("/workspace?module=Dashboard");
     } catch { setError("Sign-in service is unavailable. Please try again."); }
     finally { setPending(false); }
   }
