@@ -21,7 +21,7 @@ test("incorrect credentials, unauthenticated request and origin protection", asy
   expect((await request.get("/api/backend/auth/me")).status()).toBe(401);
   expect((await request.post("/api/auth/logout", { headers: { Origin: "https://foreign.example" } })).status()).toBe(403);
   expect((await request.get("/api/backend/not-approved")).status()).toBe(404);
-  await page.goto("/workspace"); await expect(page.getByRole("heading", { name: "Sign in to continue" })).toBeVisible();
+  await page.goto("/workspace"); await expect(page).toHaveURL(/\/login$/);
 });
 test("mobile navigation, RTL logical layout and keyboard entry", async ({ page }) => {
   await page.route("**/api/backend/customers", route => route.fulfill({ json: [] }));

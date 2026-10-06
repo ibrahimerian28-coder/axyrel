@@ -1,3 +1,4 @@
+import { formatDateTime, formatDate } from "@/lib/datetime";
 import type { Row } from "@/features/phase2/screens";
 import { label } from "@/features/phase2/screens";
 import { ApiError } from "@/lib/api/client";
@@ -16,13 +17,9 @@ export function eventInput(value?: string | number | null) {
   const parts = Object.fromEntries(cairo.formatToParts(date).map(p => [p.type, p.value]));
   return { local: `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`, offset: parts.timeZoneName.replace("GMT", "") || "Z" };
 }
-export function eventLabel(value?: string | number | null) { if (!value) return "Not recorded"; const date = instant(String(value)); return Number.isNaN(date.valueOf()) ? "Time unavailable" : cairo.format(date); }
-// Read-only Schedule presentation; the numeric formatter used by eventInput
-// and every timestamp/offset conversion above remain unchanged.
-const scheduleDisplay = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Cairo", year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZoneName: "longOffset" });
-const calendarDisplay = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", weekday: "short", year: "numeric", month: "short", day: "2-digit" });
-export function scheduleEventLabel(value?: string | number | null) { if (!value) return "Not recorded"; const date = instant(String(value)); return Number.isNaN(date.valueOf()) ? "Time unavailable" : scheduleDisplay.format(date); }
-export function calendarDateLabel(day: string) { return calendarDisplay.format(new Date(`${day}T12:00:00Z`)); }
+export const eventLabel = formatDateTime;
+export const scheduleEventLabel = formatDateTime;
+export const calendarDateLabel = formatDate;
 export function dayKey(value: string) { return eventInput(value).local.slice(0, 10); }
 export function addDays(day: string, amount: number) { const date = new Date(`${day}T12:00:00Z`); date.setUTCDate(date.getUTCDate() + amount); return date.toISOString().slice(0, 10); }
 export function currentWeek() { const today = dayKey(new Date().toISOString()); const weekday = new Date(`${today}T12:00:00Z`).getUTCDay(); return addDays(today, -((weekday + 6) % 7)); }

@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MvpScreen, ReportsScreen } from "@/features/phase4/screens";
@@ -17,6 +17,9 @@ function WorkspaceContent() {
   const router = useRouter(); const params = useSearchParams(); const area = (params.get("module") === "Workspace" ? "Dashboard" : params.get("module")) || "Dashboard"; const record = params.get("record") || undefined; const cache = useQueryClient(); const [open, setOpen] = useState(false); const [logoutError, setLogoutError] = useState("");
   function navigate(module: string, id?: string) { router.push(`/workspace?module=${encodeURIComponent(module)}${id ? `&record=${encodeURIComponent(id)}` : ""}`); setOpen(false); }
   const user = useQuery({ queryKey: ["session", "me"], queryFn: () => api<User>("auth/me") });
+  useEffect(() => {
+    if (user.error instanceof ApiError && user.error.status === 401) router.replace("/login");
+  }, [user.error, router]);
   if (user.isPending) return <LoadingState />;
   if (user.error) return user.error instanceof ApiError && user.error.status === 401 ? <main className="state"><h1>Sign in to continue</h1><a href="/login">Sign in</a></main> : user.error instanceof ApiError && user.error.status === 403 ? <PermissionState /> : <ErrorState message={user.error.message} retry={() => { void user.refetch(); }} />;
   const me = user.data; const available = modules.filter(([, permission]) => me.permissions.includes(permission));
