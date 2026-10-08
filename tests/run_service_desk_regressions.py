@@ -9,7 +9,9 @@ import subprocess
 import sys
 
 ROOT=Path(__file__).resolve().parents[1]
-OUTPUT=ROOT/'frontend/test-results/service-desk-backend'
+# Playwright clears frontend/test-results when foundation starts. Keep backend
+# evidence outside that tree so browser validation cannot erase completed runs.
+OUTPUT=ROOT/'test-results/service-desk-backend'
 
 def run(name):
     env={**os.environ,'AXYREL_RETAIN_TEST_DATABASES':'1','AXYREL_ENV':'test','AXYREL_PHASE3_TEST_PORT':str(20000+int(uuid4().hex[:4],16)%40000)}

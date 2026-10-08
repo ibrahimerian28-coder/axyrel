@@ -20,6 +20,7 @@ test("incorrect credentials, unauthenticated request and origin protection", asy
   await page.goto("/login"); await page.getByLabel("Email", { exact: true }).fill("admin@example.test"); await page.getByLabel("Password", { exact: true }).fill("wrong"); await page.getByRole("button", { name: "Sign in", exact: true }).click(); await expect(page.locator("form [role='alert']")).toContainText("Incorrect email or password");
   expect((await request.get("/api/backend/auth/me")).status()).toBe(401);
   expect((await request.post("/api/auth/logout", { headers: { Origin: "https://foreign.example" } })).status()).toBe(403);
+  expect((await request.post("/api/auth/login", { headers: { Origin: "https://foreign.example" }, data: { email: "admin@example.test", password: "synthetic-password" } })).status()).toBe(403);
   expect((await request.get("/api/backend/not-approved")).status()).toBe(404);
   await page.goto("/workspace"); await expect(page).toHaveURL(/\/login$/);
 });

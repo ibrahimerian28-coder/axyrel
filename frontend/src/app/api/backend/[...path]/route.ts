@@ -52,6 +52,7 @@ async function forward(request: Request, context: { params: Promise<{ path: stri
       const body = upstream.status >= 500 ? JSON.stringify({ detail: "The service could not complete the request." }) : await upstream.arrayBuffer();
       const response = new NextResponse(upstream.status === 204 ? null : body, { status: upstream.status, headers: { "Content-Type": upstream.ok && request.method === "GET" ? "image/webp" : "application/json", "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" } });
       if (upstream.status === 401) response.cookies.set(SESSION_COOKIE, "", { ...cookieOptions(request), maxAge: 0 });
+      else if (upstream.ok && session.startsWith("axs_")) response.cookies.set(SESSION_COOKIE, session, cookieOptions(request));
       return response;
     }
     let requestBody: string | undefined;
@@ -66,6 +67,7 @@ async function forward(request: Request, context: { params: Promise<{ path: stri
     const body = upstream.status >= 500 ? JSON.stringify({ detail: "The service could not complete the request." }) : await upstream.text();
     const response = new NextResponse(upstream.status === 204 ? null : body, { status: upstream.status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
     if (upstream.status === 401) response.cookies.set(SESSION_COOKIE, "", { ...cookieOptions(request), maxAge: 0 });
+    else if (upstream.ok && session.startsWith("axs_")) response.cookies.set(SESSION_COOKIE, session, cookieOptions(request));
     return response;
   } catch { return NextResponse.json({ detail: "The service is unavailable." }, { status: 502 }); }
 }

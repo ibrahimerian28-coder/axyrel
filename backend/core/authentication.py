@@ -12,6 +12,7 @@ from backend.core.database import get_db
 from backend.core.security import decode_access_token, oauth2_scheme
 from backend.models.user import User
 from backend.services.auth import AuthenticationService
+from backend.services.auth_sessions import PREFIX, resolve_session
 
 
 AuthenticationDBSession = Annotated[Session, Depends(get_db)]
@@ -33,6 +34,12 @@ def get_auth_context(
     db: AuthenticationDBSession,
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> AuthContext:
+    if token.startswith(PREFIX):
+        session = resolve_session(db, token)
+        user = _authentication_service.get_active_user(db, session.user_id) if session else None
+        if user is None or user.company_id != session.company_id:
+            raise HTTPException(status_code=401, detail="Invalid or revoked session", headers={"WWW-Authenticate": "Bearer"})
+        return AuthContext(user=user)
     try:
         claims = decode_access_token(token)
     except Exception as exc:

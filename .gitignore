@@ -9,3 +9,6 @@ __pycache__/
 
 # Persistent local owner review secrets, credentials, logs and private images
 .owner-review/
+
+# Isolated backend regression artifacts, outside Playwright's cleared output.
+/test-results/

@@ -4,6 +4,12 @@ Status: remediations 1-3 implemented; remediation 4 failure semantics implemente
 but persistent revocable sessions STOPPED for owner architecture/migration approval.
 Service Desk is not declared closed. No deployment or next-module work.
 
+Subsequent owner approval authorized implementation and isolated migration tests.
+See [persistent revocable sessions](persistent_revocable_sessions.md) for the
+implemented architecture and final validation. The historical approval boundary
+below records the previous checkpoint. Owner Review migration/deployment remain
+unauthorized; no next-module work is started.
+
 ## Repository and data safety
 
 - Initial branch: `frontend/v1` in `D:\Axyrel_BACKUP_BEFORE_GEMINI`.

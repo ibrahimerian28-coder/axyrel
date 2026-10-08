@@ -1,4 +1,5 @@
 from backend.models.asset import Asset
+from backend.models.auth_session import AuthSession
 from backend.models.audit_log import AuditLog
 from backend.models.company import Company
 from backend.models.customer import Customer
@@ -17,7 +18,7 @@ from backend.models.user import User
 from backend.models.work_order import WorkOrder
 
 __all__ = [
-    "Asset", "AuditLog", "Company", "Customer", "Expense", "InventoryItem",
+    "Asset", "AuthSession", "AuditLog", "Company", "Customer", "Expense", "InventoryItem",
     "InventoryTransaction", "Invoice", "Notification", "Schedule",
     "ServiceContract", "ServiceHistory", "ServiceRequest", "ServiceVisit",
     "TechnicianStock", "User", "WorkOrder",

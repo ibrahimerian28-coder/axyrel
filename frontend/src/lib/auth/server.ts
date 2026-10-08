@@ -16,5 +16,5 @@ export function sameOrigin(request: Request): boolean {
   catch { return false; }
 }
 export function cookieOptions(request: Request) {
-  return { httpOnly: true, sameSite: "strict" as const, secure: publicOrigin(request).startsWith("https:"), path: "/" };
+  return { httpOnly: true, sameSite: "strict" as const, secure: publicOrigin(request).startsWith("https:"), path: "/", maxAge: 60 * 60 * 24 * 400 };
 }

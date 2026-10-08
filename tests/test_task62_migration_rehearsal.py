@@ -128,7 +128,7 @@ class Task62MigrationRehearsalTests(unittest.TestCase):
         before = self._rows()
         with Session(self.engine) as db, db.begin():
             service.create_item(db, uuid4(), self._mapped({'item_name': 'Synthetic'}))
-        self.assertEqual(self._apply(fixture.ROOT / 'migrations').count('SKIP:'), 14)
+        self.assertEqual(self._apply(fixture.ROOT / 'migrations').count('SKIP:'), len(fixture.discover_migrations(fixture.ROOT / 'migrations')))
         self.assertEqual(self._rows(), before)
 
 
